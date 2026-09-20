@@ -26,7 +26,7 @@
         .a4-page {
             width: 210mm;
             min-height: 297mm;
-            padding: 12mm;
+            padding: 8mm;
             margin: auto;
             background: white;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
@@ -48,12 +48,14 @@
         .fs-large { font-size: 18px; }
         .fs-xlarge { font-size: 21px; }
 
-        /* Print Media Styles */
+        /* Print Media Styles Optimization for PDF */
         @media print {
-            body {
+            html, body {
                 background: white !important;
                 padding: 0 !important;
                 margin: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
             }
             .no-print {
                 display: none !important;
@@ -61,14 +63,15 @@
             .a4-page {
                 box-shadow: none !important;
                 width: 100% !important;
-                height: 100% !important;
+                min-height: 100vh !important;
                 margin: 0 !important;
-                padding: 10mm !important;
-                page-break-after: always;
+                padding: 5mm !important;
+                page-break-after: avoid;
+                page-break-inside: avoid;
             }
             @page {
                 size: A4 portrait;
-                margin: 0;
+                margin: 0mm !important;
             }
         }
 
@@ -123,29 +126,29 @@
     <div class="app-container">
         
         <!-- Preview Panel (Left Side on Desktop) -->
-        <div class="flex-1 bg-gray-500 p-4 md:p-8 overflow-y-auto flex justify-center items-start order-2 lg:order-1">
+        <div class="flex-1 bg-gray-500 p-2 md:p-6 overflow-y-auto flex justify-center items-start order-2 lg:order-1">
             
             <!-- A4 Exam Sheet Preview -->
             <div id="exam-sheet" class="a4-page font-amiri border-double-custom fs-medium flex flex-col justify-between">
                 <div>
                     <!-- Header Section (الترويسة) -->
-                    <div class="grid grid-cols-3 items-center text-center border-b pb-3 mb-3 border-black">
+                    <div class="grid grid-cols-3 items-center text-center border-b pb-2 mb-2 border-black">
                         <!-- Right Column -->
-                        <div class="text-right space-y-1">
+                        <div class="text-right space-y-0.5">
                             <div id="pv-right-1" class="font-bold">إدارة</div>
                             <div id="pv-right-2">اسم المدرسة هنا</div>
                             <div id="pv-right-3" class="text-xs">للبنين / للبنات</div>
                         </div>
 
                         <!-- Center Column -->
-                        <div class="text-center space-y-1">
+                        <div class="text-center space-y-0.5">
                             <div id="pv-center-1" class="font-bold text-lg">أسئلة امتحان نهاية السنة</div>
                             <div id="pv-center-2" class="text-xs">للعام الدراسي 2025-2026</div>
                             <div id="pv-center-3" class="text-xs">الدور الأول</div>
                         </div>
 
                         <!-- Left Column -->
-                        <div class="text-left space-y-1">
+                        <div class="text-left space-y-0.5">
                             <div><span class="font-bold">المادة:</span> <span id="pv-left-subject">اللغة العربية</span></div>
                             <div><span class="font-bold">الصف:</span> <span id="pv-left-class">الثاني المتوسط</span></div>
                             <div><span class="font-bold">الوقت:</span> <span id="pv-left-time">ساعة ونصف</span></div>
@@ -153,24 +156,21 @@
                         </div>
                     </div>
 
-                    <!-- Header Line -->
-                    <div id="pv-header-line" class="w-full mb-3 border-b border-black"></div>
-
                     <!-- General Note (الملاحظة العامة) -->
-                    <div id="pv-note-box" class="mb-4">
-                        <p id="pv-note" class="font-bold border-b border-black pb-1 inline-block">ملاحظة: الإجابة عن جميع الأسئلة (لكل سؤال 20 درجة)</p>
+                    <div id="pv-note-box" class="mb-3 text-center">
+                        <p id="pv-note" class="font-bold border-b border-black pb-0.5 inline-block">ملاحظة: الإجابة عن جميع الأسئلة (لكل سؤال 20 درجة)</p>
                     </div>
 
                     <!-- Dynamic Sections & Questions Container -->
-                    <div id="pv-questions-container" class="space-y-4">
+                    <div id="pv-questions-container" class="space-y-3">
                         <!-- Dynamic Content Rendered via JS -->
                     </div>
                 </div>
 
                 <!-- Footer Section (التذييل) -->
-                <div class="mt-8 pt-4 border-t border-black">
+                <div class="mt-4 pt-2 border-t border-black">
                     <div class="flex justify-between items-end">
-                        <div id="pv-teacher-name" class="font-bold">مدرس المادة: أ. أحمد علي / أ. حسين كريم</div>
+                        <div class="font-bold">مدرس المادة: <span id="pv-teacher-name" class="font-semibold">أ. أحمد علي / أ. حسين كريم</span></div>
                         <div id="pv-wish" class="font-bold italic">تمنياتنا لكم بالنجاح والتوفيق</div>
                     </div>
                 </div>
@@ -308,7 +308,7 @@
 
                 <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-3">
                     <h3 class="font-bold text-xs text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-user-pen ml-1"></i> أسماء المدرسين والعبارة التشجيعية</h3>
-                    <input type="text" id="in-teacher" value="مدرس المادة: أ. أحمد علي / أ. حسين كريم" oninput="updateFooter()" class="w-full text-xs p-2 border rounded" placeholder="اسم المدرس (يمكن إضافة أكثر من مدرس يفصل بينهما علامة /)">
+                    <input type="text" id="in-teacher" value="أ. أحمد علي / أ. حسين كريم" oninput="updateFooter()" class="w-full text-xs p-2 border rounded" placeholder="أسماء المدرسين">
                     <input type="text" id="in-wish" value="تمنياتنا لكم بالنجاح والتوفيق" oninput="updateFooter()" class="w-full text-xs p-2 border rounded" placeholder="عبارة تشجيعية">
                 </div>
 
@@ -391,7 +391,7 @@
             document.getElementById('btn-' + tabId).className = "flex-1 py-2 text-center border-b-2 border-amber-500 text-amber-600 font-bold";
         }
 
-        // Direct Text Input Updates (Focus Maintenance Solution)
+        // Direct Text Input Updates
         function updateHeader() {
             document.getElementById('pv-right-1').innerText = document.getElementById('in-r1').value;
             document.getElementById('pv-right-2').innerText = document.getElementById('in-r2').value;
@@ -661,14 +661,14 @@
             examData.items.forEach((item) => {
                 if (item.type === 'section') {
                     const secBlock = document.createElement('div');
-                    secBlock.className = "text-center my-3";
+                    secBlock.className = "text-center my-2";
                     secBlock.innerHTML = `
                         <span class="font-bold px-4 py-0.5 inline-block ${secLineClass}">[ ${item.title} ]</span>
                     `;
                     container.appendChild(secBlock);
                 } else if (item.type === 'question') {
                     const qBlock = document.createElement('div');
-                    qBlock.className = `pb-3 ${sepClass}`;
+                    qBlock.className = `pb-2 ${sepClass}`;
 
                     let scoreStr = item.score ? `(${item.score} درجة)` : '';
 
@@ -686,10 +686,11 @@
                         }
 
                         contentHtml = `
-                            <div class="mt-1">
-                                <div><span class="font-bold">${item.num}:</span> ${item.text}</div>
-                                ${mainItemsRender}
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1"><span class="font-bold">${item.num}:</span> ${item.text}</div>
+                                <span class="font-bold text-xs whitespace-nowrap mr-2">${scoreStr}</span>
                             </div>
+                            ${mainItemsRender}
                         `;
                     } else {
                         // Question with sub-questions
@@ -720,20 +721,17 @@
                         });
 
                         contentHtml = `
-                            <div><span class="font-bold">${item.num}:</span> ${item.text}</div>
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1"><span class="font-bold">${item.num}:</span> ${item.text}</div>
+                                <span class="font-bold text-xs whitespace-nowrap mr-2">${scoreStr}</span>
+                            </div>
                             <div class="space-y-1 mt-1">
                                 ${subsHtml}
                             </div>
                         `;
                     }
 
-                    qBlock.innerHTML = `
-                        <div class="flex justify-between items-center font-bold mb-1">
-                            <span>${item.num}</span>
-                            <span>${scoreStr}</span>
-                        </div>
-                        ${contentHtml}
-                    `;
+                    qBlock.innerHTML = contentHtml;
                     container.appendChild(qBlock);
                 }
             });
