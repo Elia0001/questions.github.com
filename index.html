@@ -22,14 +22,32 @@
         .font-naskh { font-family: 'Noto Naskh Arabic', serif; }
         .font-scheherazade { font-family: 'Scheherazade New', serif; }
 
+        /* Screen Preview Layout */
+        .app-container {
+            display: flex;
+            height: calc(100vh - 57px);
+            overflow: hidden;
+        }
+
+        .preview-pane {
+            flex: 1;
+            background-color: #64748b;
+            padding: 1.5rem;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
         /* A4 Page Simulation Styling */
         .a4-page {
             width: 210mm;
             min-height: 297mm;
-            padding: 6mm;
-            margin: auto;
+            height: auto;
+            padding: 8mm;
+            margin: 0 auto;
             background: white;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
             position: relative;
             box-sizing: border-box;
             color: #000;
@@ -46,41 +64,10 @@
         .border-dashed-custom { border: 2px dashed #000 !important; }
 
         /* Font Sizes */
-        .fs-small { font-size: 13px; }
-        .fs-medium { font-size: 15px; }
-        .fs-large { font-size: 18px; }
-        .fs-xlarge { font-size: 21px; }
-
-        /* Print Media Styles Optimization for PDF */
-        @media print {
-            html, body {
-                background: white !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                width: 100% !important;
-                height: 100% !important;
-            }
-            .no-print {
-                display: none !important;
-            }
-            .a4-page {
-                box-shadow: none !important;
-                width: 100% !important;
-                height: 297mm !important;
-                min-height: 297mm !important;
-                margin: 0 !important;
-                padding: 4mm !important;
-                page-break-after: avoid;
-                page-break-inside: avoid;
-                display: flex !important;
-                flex-direction: column !important;
-                justify-content: space-between !important;
-            }
-            @page {
-                size: A4 portrait;
-                margin: 0mm !important;
-            }
-        }
+        .fs-small { font-size: 13px; line-height: 1.4; }
+        .fs-medium { font-size: 15px; line-height: 1.5; }
+        .fs-large { font-size: 17px; line-height: 1.5; }
+        .fs-xlarge { font-size: 19px; line-height: 1.6; }
 
         /* Separator Line Styles */
         .sep-none { border-bottom: none; }
@@ -89,21 +76,69 @@
         .sep-dotted { border-bottom: 2px dotted #000; }
         .sep-double { border-bottom: 3.5px double #000; }
 
-        .app-container {
-            display: flex;
-            height: 100vh;
-            overflow: hidden;
-        }
-
         @media (max-width: 1024px) {
             .app-container {
                 flex-direction: column;
                 height: auto;
                 overflow: visible;
             }
+            .preview-pane {
+                padding: 0.5rem;
+            }
             .a4-page {
                 width: 100%;
                 min-height: auto;
+            }
+        }
+
+        /* Direct & Unrestricted Print Media Styles */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0mm !important;
+            }
+
+            html, body {
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                overflow: visible !important;
+            }
+
+            .no-print {
+                display: none !important;
+            }
+
+            .app-container {
+                display: block !important;
+                height: auto !important;
+                overflow: visible !important;
+            }
+
+            .preview-pane {
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                overflow: visible !important;
+                display: block !important;
+            }
+
+            .a4-page {
+                box-shadow: none !important;
+                width: 210mm !important;
+                height: 297mm !important;
+                max-height: 297mm !important;
+                padding: 8mm !important;
+                margin: 0 !important;
+                box-sizing: border-box !important;
+                page-break-after: avoid !important;
+                page-break-inside: avoid !important;
+                display: flex !important;
+                flex-direction: column !important;
+                justify-content: space-between !important;
+                overflow: hidden !important;
             }
         }
     </style>
@@ -132,8 +167,8 @@
     <!-- Main Workspace -->
     <div class="app-container">
         
-        <!-- Preview Panel (Left Side on Desktop) -->
-        <div class="flex-1 bg-gray-500 p-2 md:p-6 overflow-y-auto flex justify-center items-start order-2 lg:order-1">
+        <!-- Preview Panel -->
+        <div class="preview-pane order-2 lg:order-1">
             
             <!-- A4 Exam Sheet Preview -->
             <div id="exam-sheet" class="a4-page font-amiri border-double-custom fs-medium">
@@ -223,8 +258,8 @@
                             <select id="cfg-font-size" onchange="updateDesign()" class="w-full text-xs p-2 border rounded">
                                 <option value="fs-small">صغير (13px)</option>
                                 <option value="fs-medium" selected>متوسط (15px)</option>
-                                <option value="fs-large">كبير (18px)</option>
-                                <option value="fs-xlarge">كبير جداً (21px)</option>
+                                <option value="fs-large">كبير (17px)</option>
+                                <option value="fs-xlarge">كبير جداً (19px)</option>
                             </select>
                         </div>
                     </div>
