@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منشئ الأسئلة الامتحانية الاحترافي - احتواء تلقائي A4</title>
+    <title>منشئ الأسئلة الامتحانية الاحترافي - صفحة A4 واحدة مؤكدة</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome -->
+    <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <!-- Google Fonts -->
@@ -15,18 +15,23 @@
     <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@400;600;700;800&family=Noto+Naskh+Arabic:wght@400;600;700&family=Scheherazade+New:wght@400;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
 
     <style>
-        /* Font Family Definitions */
         .font-cairo { font-family: 'Cairo', sans-serif; }
         .font-amiri { font-family: 'Amiri', serif; }
         .font-tajawal { font-family: 'Tajawal', sans-serif; }
         .font-naskh { font-family: 'Noto Naskh Arabic', serif; }
         .font-scheherazade { font-family: 'Scheherazade New', serif; }
 
-        /* Outer A4 Canvas Wrapper */
+        /* A4 Page Dimensions (Exact) */
+        :root {
+            --a4-width: 210mm;
+            --a4-height: 296mm; /* 296mm avoids overflow edge case in print drivers */
+        }
+
+        /* Screen Preview Wrapper */
         .a4-wrapper {
-            width: 210mm;
-            height: 297mm;
-            background: white;
+            width: var(--a4-width);
+            height: var(--a4-height);
+            background: #ffffff;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
             position: relative;
             overflow: hidden;
@@ -36,9 +41,9 @@
 
         /* Inner Content Sheet that Scales Automatically */
         .a4-scalable-content {
-            width: 210mm;
-            height: 297mm;
-            padding: 3mm;
+            width: var(--a4-width);
+            height: var(--a4-height);
+            padding: 8mm 10mm;
             position: absolute;
             top: 0;
             right: 0;
@@ -48,54 +53,21 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            background: white;
         }
 
-        /* Border Styles */
+        /* Borders */
         .border-none { border: none !important; }
         .border-thin { border: 1px solid #000 !important; }
         .border-thick { border: 2px solid #000 !important; }
         .border-double-custom { border: 4px double #000 !important; }
         .border-dashed-custom { border: 2px dashed #000 !important; }
 
-        /* Font Size Baseline */
+        /* Font Sizes */
         .fs-small { font-size: 12px; }
         .fs-medium { font-size: 14px; }
         .fs-large { font-size: 16px; }
         .fs-xlarge { font-size: 18px; }
-
-        /* Print Media Styles Optimization */
-        @media print {
-            html, body {
-                background: white !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                width: 210mm !important;
-                height: 297mm !important;
-                overflow: hidden !important;
-            }
-            .no-print {
-                display: none !important;
-            }
-            .a4-wrapper {
-                box-shadow: none !important;
-                width: 210mm !important;
-                height: 297mm !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                page-break-after: avoid;
-                page-break-inside: avoid;
-                overflow: hidden !important;
-            }
-            .a4-scalable-content {
-                width: 210mm !important;
-                height: 297mm !important;
-                padding: 2mm !important;
-            }
-            @page {
-                size: A4 portrait;
-                margin: 0mm !important;
-            }
-        }
 
         /* Separator Line Styles */
         .sep-none { border-bottom: none; }
@@ -106,43 +78,94 @@
 
         .app-container {
             display: flex;
-            height: 100vh;
+            height: calc(100vh - 61px);
             overflow: hidden;
         }
 
-        @media (max-width: 1024px) {
-            .app-container {
-                flex-direction: column;
-                height: auto;
-                overflow: visible;
+        /* STRICT SINGLE-PAGE PRINT RULES */
+        @media print {
+            @page {
+                size: A4 portrait;
+                margin: 0 !important;
             }
+
+            html, body {
+                width: 210mm !important;
+                height: 296mm !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: hidden !important;
+                background: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .no-print, header, .app-container > div:last-child {
+                display: none !important;
+            }
+
+            .app-container {
+                display: block !important;
+                height: 296mm !important;
+                width: 210mm !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                overflow: hidden !important;
+            }
+
+            .flex-1.bg-slate-800 {
+                background: white !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                overflow: hidden !important;
+                display: block !important;
+                width: 210mm !important;
+                height: 296mm !important;
+            }
+
             .a4-wrapper {
-                width: 100%;
-                max-width: 210mm;
-                height: auto;
-                aspect-ratio: 1 / 1.414;
+                box-shadow: none !important;
+                width: 210mm !important;
+                height: 296mm !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                overflow: hidden !important;
+                page-break-before: avoid !important;
+                page-break-after: avoid !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
+            }
+
+            .a4-scalable-content {
+                width: 210mm !important;
+                height: 296mm !important;
+                top: 0 !important;
+                right: 0 !important;
+                transform-origin: top center !important;
+                page-break-inside: avoid !important;
+                break-inside: avoid !important;
             }
         }
     </style>
 </head>
-<body class="bg-slate-900 font-cairo text-gray-800 antialiased">
+<body class="bg-slate-900 font-cairo text-gray-800 antialiased h-screen overflow-hidden">
 
-    <header class="bg-slate-950 text-white p-3 border-b border-slate-800 shadow-md no-print flex flex-wrap justify-between items-center gap-2">
+    <header class="bg-slate-950 text-white p-3 border-b border-slate-800 shadow-md no-print flex flex-wrap justify-between items-center gap-2 h-[61px]">
         <div class="flex items-center space-x-3 space-x-reverse">
             <i class="fa-solid fa-file-pen text-amber-400 text-2xl"></i>
             <div>
-                <h1 class="font-bold text-lg leading-tight">منشئ الأسئلة الامتحانية الاحترافي</h1>
-                <p class="text-xs text-slate-400">خاصية الاحتواء التلقائي لورقة A4 بدون اقتطاع (تصميم الاستاذ علي سالم هادي)</p>
+                <h1 class="font-bold text-base md:text-lg leading-tight">منشئ الأسئلة الامتحانية الاحترافي</h1>
+                <p class="text-[11px] text-slate-400">ضمان طباعة صفحة A4 واحدة بدون تجاوزات أو صفحات زائدة</p>
             </div>
         </div>
         <div class="flex items-center gap-2">
             <div id="scale-badge" class="bg-emerald-950 text-emerald-400 border border-emerald-800 text-xs px-2.5 py-1.5 rounded-lg font-bold flex items-center gap-1.5">
-                <i class="fa-solid fa-expand"></i> نسبة الاحتواء: <span id="scale-value">100%</span>
+                <i class="fa-solid fa-compress"></i> الاحتواء الحرج: <span id="scale-value">100%</span>
             </div>
-            <button onclick="window.print()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-2 rounded-lg text-sm transition flex items-center gap-2 shadow">
+            <button onclick="triggerPrint()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-1.5 rounded-lg text-sm transition flex items-center gap-2 shadow">
                 <i class="fa-solid fa-print"></i> طباعة / تصدير PDF
             </button>
-            <button onclick="resetData()" class="bg-red-600/30 hover:bg-red-600 text-red-200 hover:text-white border border-red-500/50 px-3 py-2 rounded-lg text-sm transition">
+            <button onclick="resetData()" class="bg-red-600/30 hover:bg-red-600 text-red-200 hover:text-white border border-red-500/50 px-3 py-1.5 rounded-lg text-xs transition">
                 <i class="fa-solid fa-rotate-right"></i> إعادة ضبط
             </button>
         </div>
@@ -151,16 +174,17 @@
     <div class="app-container">
         
         <!-- Live Preview Canvas Area -->
-        <div class="flex-1 bg-slate-800 p-2 md:p-6 overflow-y-auto flex justify-center items-start order-2 lg:order-1">
+        <div class="flex-1 bg-slate-800 p-2 md:p-6 overflow-y-auto flex justify-center items-start">
             
-            <!-- Outer Fixed-Size A4 Sheet Container -->
+            <!-- Outer Fixed A4 Container -->
             <div id="a4-sheet-wrapper" class="a4-wrapper">
                 
-                <!-- Inner Scalable Sheet Content -->
+                <!-- Inner Auto-scalable Content Sheet -->
                 <div id="exam-sheet" class="a4-scalable-content font-amiri border-double-custom fs-medium">
-                    <div>
-                        <!-- Header Section (الترويسة) -->
-                        <div class="grid grid-cols-3 items-center text-center border-b pb-1 mb-1 border-black">
+                    <!-- Top Content Area -->
+                    <div id="exam-inner-body" class="flex-1 flex flex-direction-column justify-start">
+                        <!-- Header Section -->
+                        <div class="w-full grid grid-cols-3 items-center text-center border-b pb-1.5 mb-2 border-black">
                             <!-- Right Column -->
                             <div class="text-right space-y-0.5">
                                 <div id="pv-right-1" class="font-bold">إدارة</div>
@@ -184,24 +208,24 @@
                             </div>
                         </div>
 
-                        <!-- General Note (الملاحظة العامة) -->
-                        <div id="pv-note-box" class="mb-2 text-center">
+                        <!-- Note Box -->
+                        <div id="pv-note-box" class="mb-2 text-center w-full">
                             <p id="pv-note" class="font-bold border-b border-black pb-0.5 inline-block">ملاحظة: الإجابة عن جميع الأسئلة (لكل سؤال 20 درجة)</p>
                         </div>
 
                         <!-- Dynamic Questions Container -->
-                        <div id="pv-questions-container" class="space-y-2">
-                            <!-- Dynamic Questions Rendered via JS -->
+                        <div id="pv-questions-container" class="space-y-1.5 w-full">
+                            <!-- Questions rendered dynamically -->
                         </div>
                     </div>
 
-                    <!-- Footer Section (التذييل) -->
-                    <div class="mt-2 pt-1 border-t border-black">
+                    <!-- Footer Section -->
+                    <div id="exam-footer" class="pt-1.5 border-t border-black w-full mt-auto">
                         <div class="flex justify-between items-end">
                             <div class="font-bold flex items-center gap-2">
                                 <span id="pv-teacher-label">مدرس المادة:</span>
                                 <div id="pv-teachers-list" class="flex items-center gap-4">
-                                    <!-- Dynamic Teachers List -->
+                                    <!-- Teachers rendered dynamically -->
                                 </div>
                             </div>
                             <div id="pv-wish" class="font-bold italic">تمنياتنا لكم بالنجاح والتوفيق</div>
@@ -212,9 +236,10 @@
             </div>
         </div>
 
-        <div class="w-full lg:w-[480px] bg-white border-l border-gray-200 overflow-y-auto p-4 space-y-5 order-1 lg:order-2 no-print">
+        <!-- Sidebar Control Panel -->
+        <div class="w-full lg:w-[480px] bg-white border-l border-gray-200 overflow-y-auto p-4 space-y-5 no-print">
             
-            <!-- Tabs Navigation -->
+            <!-- Tabs -->
             <div class="flex border-b text-sm font-bold">
                 <button onclick="switchTab('tab-questions')" id="btn-tab-questions" class="flex-1 py-2 text-center border-b-2 border-amber-500 text-amber-600">الأسئلة والأقسام</button>
                 <button onclick="switchTab('tab-general')" id="btn-tab-general" class="flex-1 py-2 text-center text-gray-500 hover:text-gray-700">الترويسة والتنسيق</button>
@@ -236,7 +261,7 @@
                 </div>
 
                 <div id="questions-editor-list" class="space-y-3">
-                    <!-- Dynamic Question Controls -->
+                    <!-- Dynamic Controls -->
                 </div>
             </div>
 
@@ -337,7 +362,6 @@
                     <input type="text" id="in-note" value="ملاحظة: الإجابة عن جميع الأسئلة (لكل سؤال 20 درجة)" oninput="updateFooter()" class="w-full text-xs p-2 border rounded font-bold">
                 </div>
 
-                <!-- Dynamic Teachers Array Inputs -->
                 <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-3">
                     <div class="flex justify-between items-center">
                         <h3 class="font-bold text-xs text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-user-pen ml-1"></i> أسماء مدرسين المادة</h3>
@@ -363,7 +387,6 @@
     </div>
 
     <script>
-        // Global App State
         let teachers = ["أ. أحمد علي", "أ. حسين كريم"];
 
         let examData = {
@@ -416,14 +439,12 @@
             ]
         };
 
-        // App Initialization
         window.onload = function() {
             renderTeachersEditor();
             renderEditor();
             renderPreview();
         };
 
-        // Tab Switching Logic
         function switchTab(tabId) {
             ['tab-general', 'tab-questions', 'tab-footer'].forEach(id => {
                 document.getElementById(id).classList.add('hidden');
@@ -436,7 +457,6 @@
             document.getElementById('btn-' + tabId).className = "flex-1 py-2 text-center border-b-2 border-amber-500 text-amber-600 font-bold";
         }
 
-        // Live Header / Footer Updates
         function updateHeader() {
             document.getElementById('pv-right-1').innerText = document.getElementById('in-r1').value;
             document.getElementById('pv-right-2').innerText = document.getElementById('in-r2').value;
@@ -460,7 +480,6 @@
             autoFitA4Sheet();
         }
 
-        // Teacher List Logic
         function addTeacher() {
             teachers.push("أ. اسم المدرس");
             renderTeachersEditor();
@@ -526,7 +545,6 @@
             renderPreview();
         }
 
-        // Section and Question Controls
         function addMainSection() {
             examData.items.push({
                 id: 'sec_' + Date.now(),
@@ -621,7 +639,6 @@
             renderPreview();
         }
 
-        // Render Control Panel List
         function renderEditor() {
             const container = document.getElementById('questions-editor-list');
             container.innerHTML = '';
@@ -633,7 +650,7 @@
                     secDiv.innerHTML = `
                         <div class="flex items-center gap-2 flex-1">
                             <i class="fa-solid fa-folder text-amber-600"></i>
-                            <input type="text" value="${item.title}" oninput="examData.items[${index}].title = this.value; renderPreview();" class="w-full text-xs p-1.5 border rounded font-bold" placeholder="عنوان القسم (مثال: القواعد)">
+                            <input type="text" value="${item.title}" oninput="examData.items[${index}].title = this.value; renderPreview();" class="w-full text-xs p-1.5 border rounded font-bold" placeholder="عنوان القسم">
                         </div>
                         <button onclick="deleteItem(${index})" class="text-red-500 hover:text-red-700 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
                     `;
@@ -703,7 +720,7 @@
                     if (item.subs.length === 0) {
                         mainQuestionControls = `
                             <div class="space-y-2 bg-white p-2 rounded border border-gray-200">
-                                <input type="text" value="${item.text}" oninput="examData.items[${index}].text = this.value; renderPreview();" class="w-full text-xs p-1.5 border rounded" placeholder="نص السؤال المباشر هنا...">
+                                <input type="text" value="${item.text}" oninput="examData.items[${index}].text = this.value; renderPreview();" class="w-full text-xs p-1.5 border rounded" placeholder="نص السؤال المباشر...">
                                 <div class="flex items-center gap-2">
                                     <label class="text-[11px] text-gray-500">نوع السؤال:</label>
                                     <select onchange="examData.items[${index}].qType = this.value; renderEditor(); renderPreview();" class="text-xs p-1 border rounded bg-gray-50">
@@ -720,8 +737,8 @@
                     qDiv.innerHTML = `
                         <div class="flex items-center justify-between border-b pb-2 gap-2">
                             <div class="flex items-center gap-2 flex-1">
-                                <input type="text" value="${item.num}" oninput="examData.items[${index}].num = this.value; renderPreview();" class="w-16 text-xs p-1 border rounded font-bold text-center" placeholder="س1">
-                                <span class="text-xs text-gray-500 font-semibold">${item.subs.length > 0 ? '(سؤال يتضمن أفرع)' : '(سؤال مباشر)'}</span>
+                                <input type="text" value="${item.num}" oninput="examData.items[${index}].num = this.value; renderPreview();" class="w-16 text-xs p-1 border rounded font-bold text-center">
+                                <span class="text-xs text-gray-500 font-semibold">${item.subs.length > 0 ? '(أفرع)' : '(مباشر)'}</span>
                             </div>
                             <div class="flex items-center gap-1">
                                 <span class="text-xs font-bold">الدرجة:</span>
@@ -734,7 +751,7 @@
                             ${subsHtml}
                         </div>
                         <button onclick="addSubQuestion(${index})" class="w-full py-1 text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 rounded text-center font-semibold transition">
-                            + إضافة فرع للسؤال (أ ، ب ، جـ)
+                            + إضافة فرع للسؤال
                         </button>
                     `;
                     container.appendChild(qDiv);
@@ -742,7 +759,6 @@
             });
         }
 
-        // Render A4 Sheet Content
         function renderPreview() {
             const container = document.getElementById('pv-questions-container');
             const sepClass = document.getElementById('cfg-sep-style').value;
@@ -824,30 +840,30 @@
             });
 
             renderTeachersPreview();
-            
-            // Execute Dynamic Auto-Scale Calculation after DOM updates
-            setTimeout(autoFitA4Sheet, 30);
+            setTimeout(autoFitA4Sheet, 20);
         }
 
+        /* DYNAMIC AUTO-FIT SINGLE PAGE SCALER */
         function autoFitA4Sheet() {
             const wrapper = document.getElementById('a4-sheet-wrapper');
             const sheet = document.getElementById('exam-sheet');
+            const innerBody = document.getElementById('exam-inner-body');
+            const footer = document.getElementById('exam-footer');
             const scaleBadge = document.getElementById('scale-value');
 
             if (!wrapper || !sheet) return;
 
-            // Reset scale for accurate scrollHeight measurement
+            // Reset scale for accurate calculation
             sheet.style.transform = 'scale(1)';
 
-            const targetHeight = wrapper.clientHeight; // 297mm in pixels
-            const currentContentHeight = sheet.scrollHeight;
+            const maxHeight = wrapper.clientHeight; // Exact A4 height limit
+            const totalContentHeight = innerBody.scrollHeight + footer.offsetHeight + 30; // Includes padding buffer
 
-            if (currentContentHeight > targetHeight) {
-                // Calculate exact scale factor needed
-                let scale = targetHeight / currentContentHeight;
+            if (totalContentHeight > maxHeight) {
+                let scale = maxHeight / totalContentHeight;
                 
-                // Set a floor limit of 0.45 (45%) to prevent text becoming illegible
-                if (scale < 0.45) scale = 0.45;
+                // Absolute minimum safety scale (0.4)
+                if (scale < 0.4) scale = 0.4;
 
                 sheet.style.transform = `scale(${scale})`;
                 if (scaleBadge) scaleBadge.innerText = Math.round(scale * 100) + '%';
@@ -857,12 +873,17 @@
             }
         }
 
-        // Re-calculate auto-scale on window resize
+        function triggerPrint() {
+            autoFitA4Sheet();
+            setTimeout(() => {
+                window.print();
+            }, 100);
+        }
+
         window.addEventListener('resize', autoFitA4Sheet);
 
-        // Reset Data Function
         function resetData() {
-            if (confirm("هل أنت تأكد من إعادة ضبط كافة البيانات إلى الحالة الافتراضية؟")) {
+            if (confirm("هل أنت تأكد من إعادة ضبط كافة البيانات؟")) {
                 location.reload();
             }
         }
