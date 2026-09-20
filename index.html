@@ -3,890 +3,647 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منشئ الأسئلة الامتحانية الاحترافي - صفحة A4 واحدة مؤكدة</title>
-    <!-- Tailwind CSS CDN -->
+    <title>منشئ الأسئلة الامتحانية الاحترافي</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Cairo:wght@400;600;700;800&family=Noto+Naskh+Arabic:wght@400;600;700&family=Scheherazade+New:wght@400;700&family=Tajawal:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:ital,wght@0,400;0,700;1,400&family=Tajawal:wght@400;500;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
-        .font-cairo { font-family: 'Cairo', sans-serif; }
-        .font-amiri { font-family: 'Amiri', serif; }
-        .font-tajawal { font-family: 'Tajawal', sans-serif; }
-        .font-naskh { font-family: 'Noto Naskh Arabic', serif; }
-        .font-scheherazade { font-family: 'Scheherazade New', serif; }
-
-        /* A4 Page Dimensions (Exact) */
         :root {
-            --a4-width: 210mm;
-            --a4-height: 296mm; /* 296mm avoids overflow edge case in print drivers */
+            /* Dynamic font and spacing variables for auto-fit sizing */
+            --paper-font-size: 15px;
+            --paper-line-height: 1.5;
+            --paper-padding: 12mm;
+            --question-gap: 12px;
+            --subquestion-gap: 6px;
+            --header-font-size: 14px;
+            --title-font-size: 18px;
+            --table-padding: 6px;
         }
 
-        /* Screen Preview Wrapper */
-        .a4-wrapper {
-            width: var(--a4-width);
-            height: var(--a4-height);
-            background: #ffffff;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
-            position: relative;
-            overflow: hidden;
+        body {
+            font-family: 'Tajawal', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+        }
+
+        .font-amiri {
+            font-family: 'Amiri', serif;
+        }
+
+        /* Preview container custom scrollbar */
+        .preview-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .preview-scroll::-webkit-scrollbar-track {
+            background: #1e293b;
+        }
+        .preview-scroll::-webkit-scrollbar-shadow {
+            background: #334155;
+            border-radius: 4px;
+        }
+
+        /* A4 Paper Styling in Preview Mode */
+        .a4-paper {
+            width: 210mm;
+            min-height: 297mm;
+            max-height: 297mm;
+            background: white;
+            color: black;
             margin: auto;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
             box-sizing: border-box;
-        }
-
-        /* Inner Content Sheet that Scales Automatically */
-        .a4-scalable-content {
-            width: var(--a4-width);
-            height: var(--a4-height);
-            padding: 8mm 10mm;
-            position: absolute;
-            top: 0;
-            right: 0;
-            transform-origin: top right;
-            box-sizing: border-box;
-            color: #000;
+            position: relative;
             display: flex;
             flex-direction: column;
             justify-content: space-between;
-            background: white;
+            overflow: hidden; /* Prevents overflow visually */
+            padding: var(--paper-padding);
+            font-size: var(--paper-font-size);
+            line-height: var(--paper-line-height);
+            transition: all 0.2s ease-in-out;
         }
 
-        /* Borders */
-        .border-none { border: none !important; }
-        .border-thin { border: 1px solid #000 !important; }
-        .border-thick { border: 2px solid #000 !important; }
-        .border-double-custom { border: 4px double #000 !important; }
-        .border-dashed-custom { border: 2px dashed #000 !important; }
-
-        /* Font Sizes */
-        .fs-small { font-size: 12px; }
-        .fs-medium { font-size: 14px; }
-        .fs-large { font-size: 16px; }
-        .fs-xlarge { font-size: 18px; }
-
-        /* Separator Line Styles */
-        .sep-none { border-bottom: none; }
-        .sep-solid { border-bottom: 1.5px solid #000; }
-        .sep-dashed { border-bottom: 1.5px dashed #000; }
-        .sep-dotted { border-bottom: 2px dotted #000; }
-        .sep-double { border-bottom: 3.5px double #000; }
-
-        .app-container {
+        /* Inner Traditional Frame */
+        .paper-border {
+            border: 2px solid #000;
+            outline: 1px solid #000;
+            outline-offset: 3px;
+            height: 100%;
+            padding: 10px;
             display: flex;
-            height: calc(100vh - 61px);
-            overflow: hidden;
+            flex-direction: column;
+            justify-content: space-between;
+            box-sizing: border-box;
         }
 
-        /* STRICT SINGLE-PAGE PRINT RULES */
+        /* Compact Modes managed by JS Auto-Fit Engine */
+        .a4-paper.compact-level-1 {
+            --paper-font-size: 13.5px;
+            --paper-line-height: 1.4;
+            --paper-padding: 10mm;
+            --question-gap: 8px;
+            --subquestion-gap: 4px;
+            --header-font-size: 12.5px;
+            --title-font-size: 16px;
+            --table-padding: 4px;
+        }
+
+        .a4-paper.compact-level-2 {
+            --paper-font-size: 12px;
+            --paper-line-height: 1.3;
+            --paper-padding: 8mm;
+            --question-gap: 6px;
+            --subquestion-gap: 3px;
+            --header-font-size: 11.5px;
+            --title-font-size: 15px;
+            --table-padding: 3px;
+        }
+
+        .a4-paper.compact-level-3 {
+            --paper-font-size: 10.5px;
+            --paper-line-height: 1.2;
+            --paper-padding: 6mm;
+            --question-gap: 4px;
+            --subquestion-gap: 2px;
+            --header-font-size: 10.5px;
+            --title-font-size: 13.5px;
+            --table-padding: 2px;
+        }
+
+        /* Paper Typography & Dynamic Elements */
+        .paper-header-text {
+            font-size: var(--header-font-size);
+        }
+        .paper-title-text {
+            font-size: var(--title-font-size);
+            font-weight: bold;
+        }
+        .question-item {
+            margin-bottom: var(--question-gap);
+        }
+        .subquestion-item {
+            margin-top: var(--subquestion-gap);
+            margin-bottom: var(--subquestion-gap);
+        }
+
+        /* PRINT STYLES ENGINE */
         @media print {
             @page {
                 size: A4 portrait;
                 margin: 0 !important;
             }
-
+            
             html, body {
-                width: 210mm !important;
-                height: 296mm !important;
+                width: 210mm;
+                height: 297mm;
+                background: white !important;
+                color: black !important;
                 margin: 0 !important;
                 padding: 0 !important;
                 overflow: hidden !important;
-                background: white !important;
                 -webkit-print-color-adjust: exact;
                 print-color-adjust: exact;
             }
 
-            .no-print, header, .app-container > div:last-child {
+            .no-print {
                 display: none !important;
             }
 
-            .app-container {
-                display: block !important;
-                height: 296mm !important;
-                width: 210mm !important;
+            .print-wrapper {
                 padding: 0 !important;
                 margin: 0 !important;
+                width: 210mm !important;
+                height: 297mm !important;
                 overflow: hidden !important;
             }
 
-            .flex-1.bg-slate-800 {
-                background: white !important;
-                padding: 0 !important;
-                margin: 0 !important;
-                overflow: hidden !important;
-                display: block !important;
-                width: 210mm !important;
-                height: 296mm !important;
-            }
-
-            .a4-wrapper {
+            .a4-paper {
                 box-shadow: none !important;
                 width: 210mm !important;
-                height: 296mm !important;
-                margin: 0 !important;
-                padding: 0 !important;
-                overflow: hidden !important;
-                page-break-before: avoid !important;
+                height: 297mm !important;
+                max-height: 297mm !important;
+                page-break-inside: avoid !important;
                 page-break-after: avoid !important;
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
-            }
-
-            .a4-scalable-content {
-                width: 210mm !important;
-                height: 296mm !important;
-                top: 0 !important;
-                right: 0 !important;
-                transform-origin: top center !important;
-                page-break-inside: avoid !important;
-                break-inside: avoid !important;
+                break-after: avoid !important;
+                border: none !important;
             }
         }
     </style>
 </head>
-<body class="bg-slate-900 font-cairo text-gray-800 antialiased h-screen overflow-hidden">
+<body class="h-screen overflow-hidden flex flex-col bg-slate-950 text-slate-100">
 
-    <header class="bg-slate-950 text-white p-3 border-b border-slate-800 shadow-md no-print flex flex-wrap justify-between items-center gap-2 h-[61px]">
-        <div class="flex items-center space-x-3 space-x-reverse">
-            <i class="fa-solid fa-file-pen text-amber-400 text-2xl"></i>
+    <header class="no-print h-14 bg-slate-900 border-b border-slate-800 flex items-center justify-between px-6 z-20 shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-white shadow-lg">
+                <i class="fa-solid fa-file-pen text-sm"></i>
+            </div>
             <div>
-                <h1 class="font-bold text-base md:text-lg leading-tight">منشئ الأسئلة الامتحانية الاحترافي</h1>
-                <p class="text-[11px] text-slate-400">ضمان طباعة صفحة A4 واحدة بدون تجاوزات أو صفحات زائدة</p>
+                <h1 class="font-bold text-base text-slate-100">منشئ الأسئلة الامتحانية الاحترافي</h1>
+                <p class="text-xs text-slate-400">نظام التوزيع التلقائي والضبط القياسي لورقة A4 واحدة</p>
             </div>
         </div>
-        <div class="flex items-center gap-2">
-            <div id="scale-badge" class="bg-emerald-950 text-emerald-400 border border-emerald-800 text-xs px-2.5 py-1.5 rounded-lg font-bold flex items-center gap-1.5">
-                <i class="fa-solid fa-compress"></i> الاحتواء الحرج: <span id="scale-value">100%</span>
+
+        <!-- Auto-Fit Status Badge & Action Controls -->
+        <div class="flex items-center gap-4">
+            <div id="status-badge" class="px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span id="status-text">حالة الورقة: A4 صفحة واحدة متناسقة</span>
             </div>
-            <button onclick="triggerPrint()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 font-bold px-4 py-1.5 rounded-lg text-sm transition flex items-center gap-2 shadow">
-                <i class="fa-solid fa-print"></i> طباعة / تصدير PDF
-            </button>
-            <button onclick="resetData()" class="bg-red-600/30 hover:bg-red-600 text-red-200 hover:text-white border border-red-500/50 px-3 py-1.5 rounded-lg text-xs transition">
-                <i class="fa-solid fa-rotate-right"></i> إعادة ضبط
+
+            <button onclick="triggerPrint()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white font-medium rounded-lg text-sm flex items-center gap-2 transition-all shadow-md hover:shadow-indigo-500/20">
+                <i class="fa-solid fa-print"></i>
+                <span>طباعة / تصدير PDF</span>
             </button>
         </div>
     </header>
 
-    <div class="app-container">
-        
-        <!-- Live Preview Canvas Area -->
-        <div class="flex-1 bg-slate-800 p-2 md:p-6 overflow-y-auto flex justify-center items-start">
+    <div class="flex-1 flex overflow-hidden">
+
+        <!-- LEFT/RIGHT SIDEBAR INPUT FORM (380px) -->
+        <aside class="no-print w-[420px] bg-slate-900 border-l border-slate-800 flex flex-col shrink-0 z-10">
             
-            <!-- Outer Fixed A4 Container -->
-            <div id="a4-sheet-wrapper" class="a4-wrapper">
-                
-                <!-- Inner Auto-scalable Content Sheet -->
-                <div id="exam-sheet" class="a4-scalable-content font-amiri border-double-custom fs-medium">
-                    <!-- Top Content Area -->
-                    <div id="exam-inner-body" class="flex-1 flex flex-direction-column justify-start">
-                        <!-- Header Section -->
-                        <div class="w-full grid grid-cols-3 items-center text-center border-b pb-1.5 mb-2 border-black">
-                            <!-- Right Column -->
-                            <div class="text-right space-y-0.5">
-                                <div id="pv-right-1" class="font-bold">إدارة</div>
-                                <div id="pv-right-2">متوسطة عقيل بن ابي طالب للبنين</div>
-                                <div id="pv-right-3" class="text-xs">للبنين</div>
-                            </div>
-
-                            <!-- Center Column -->
-                            <div class="text-center space-y-0.5">
-                                <div id="pv-center-1" class="font-bold text-lg">أسئلة امتحان نهاية السنة</div>
-                                <div id="pv-center-2" class="text-xs">للعام الدراسي 2025-2026</div>
-                                <div id="pv-center-3" class="text-xs">الدور الأول</div>
-                            </div>
-
-                            <!-- Left Column -->
-                            <div class="text-left space-y-0.5">
-                                <div><span class="font-bold">المادة:</span> <span id="pv-left-subject">اللغة العربية</span></div>
-                                <div><span class="font-bold">الصف:</span> <span id="pv-left-class">الثاني المتوسط</span></div>
-                                <div><span class="font-bold">الوقت:</span> <span id="pv-left-time">ساعة ونصف</span></div>
-                                <div id="pv-date-box" class="text-xs"><span class="font-bold">التاريخ:</span> <span id="pv-left-date">2026/06/15</span></div>
-                            </div>
-                        </div>
-
-                        <!-- Note Box -->
-                        <div id="pv-note-box" class="mb-2 text-center w-full">
-                            <p id="pv-note" class="font-bold border-b border-black pb-0.5 inline-block">ملاحظة: الإجابة عن جميع الأسئلة (لكل سؤال 20 درجة)</p>
-                        </div>
-
-                        <!-- Dynamic Questions Container -->
-                        <div id="pv-questions-container" class="space-y-1.5 w-full">
-                            <!-- Questions rendered dynamically -->
-                        </div>
-                    </div>
-
-                    <!-- Footer Section -->
-                    <div id="exam-footer" class="pt-1.5 border-t border-black w-full mt-auto">
-                        <div class="flex justify-between items-end">
-                            <div class="font-bold flex items-center gap-2">
-                                <span id="pv-teacher-label">مدرس المادة:</span>
-                                <div id="pv-teachers-list" class="flex items-center gap-4">
-                                    <!-- Teachers rendered dynamically -->
-                                </div>
-                            </div>
-                            <div id="pv-wish" class="font-bold italic">تمنياتنا لكم بالنجاح والتوفيق</div>
-                        </div>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
-        <!-- Sidebar Control Panel -->
-        <div class="w-full lg:w-[480px] bg-white border-l border-gray-200 overflow-y-auto p-4 space-y-5 no-print">
-            
-            <!-- Tabs -->
-            <div class="flex border-b text-sm font-bold">
-                <button onclick="switchTab('tab-questions')" id="btn-tab-questions" class="flex-1 py-2 text-center border-b-2 border-amber-500 text-amber-600">الأسئلة والأقسام</button>
-                <button onclick="switchTab('tab-general')" id="btn-tab-general" class="flex-1 py-2 text-center text-gray-500 hover:text-gray-700">الترويسة والتنسيق</button>
-                <button onclick="switchTab('tab-footer')" id="btn-tab-footer" class="flex-1 py-2 text-center text-gray-500 hover:text-gray-700">الملاحظات والتذييل</button>
+            <!-- Navigation Tabs -->
+            <div class="flex border-b border-slate-800 bg-slate-950/50">
+                <button onclick="switchTab('header')" id="tab-btn-header" class="flex-1 py-3 text-xs font-bold border-b-2 border-indigo-500 text-indigo-400 transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-heading"></i>
+                    الترويسة والتصميم
+                </button>
+                <button onclick="switchTab('questions')" id="tab-btn-questions" class="flex-1 py-3 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-list-check"></i>
+                    الأسئلة والأقسام
+                </button>
+                <button onclick="switchTab('footer')" id="tab-btn-footer" class="flex-1 py-3 text-xs font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 transition-all flex items-center justify-center gap-2">
+                    <i class="fa-solid fa-signature"></i>
+                    الملاحظات والتوقيع
+                </button>
             </div>
 
-            <!-- TAB 1: QUESTIONS BUILDER -->
-            <div id="tab-questions" class="space-y-4">
-                <div class="flex justify-between items-center">
-                    <h3 class="font-bold text-sm">هيكلية الأسئلة والأقسام</h3>
-                    <div class="flex gap-1">
-                        <button onclick="addMainSection()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-2.5 py-1.5 rounded flex items-center gap-1 shadow-sm">
-                            <i class="fa-solid fa-folder-plus"></i> إضافة عنوان قسم
-                        </button>
-                        <button onclick="addQuestion()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-2.5 py-1.5 rounded flex items-center gap-1 shadow-sm">
-                            <i class="fa-solid fa-circle-plus"></i> إضافة سؤال
-                        </button>
-                    </div>
-                </div>
+            <!-- Tab Content Body (Scrollable) -->
+            <div class="flex-1 overflow-y-auto p-4 space-y-4 preview-scroll">
 
-                <div id="questions-editor-list" class="space-y-3">
-                    <!-- Dynamic Controls -->
-                </div>
-            </div>
-
-            <!-- TAB 2: GENERAL & HEADER -->
-            <div id="tab-general" class="space-y-4 hidden">
-                
-                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-3">
-                    <h3 class="font-bold text-xs text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-palette ml-1"></i> التنسيق العام والخطوط</h3>
+                <!-- TAB 1: HEADER & SCHOOL INFO -->
+                <div id="tab-header" class="space-y-4">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">بيانات الترويسة العلوية</h3>
                     
-                    <div class="grid grid-cols-2 gap-2">
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-semibold mb-1">نوع الخط العربي</label>
-                            <select id="cfg-font-family" onchange="updateDesign()" class="w-full text-xs p-2 border rounded bg-white">
-                                <option value="font-amiri">Amiri (أميري)</option>
-                                <option value="font-cairo">Cairo (القاهرة)</option>
-                                <option value="font-tajawal">Tajawal (تاجوول)</option>
-                                <option value="font-naskh">Noto Naskh (نسخ)</option>
-                                <option value="font-scheherazade">Scheherazade (شهرزاد)</option>
-                            </select>
+                            <label class="block text-xs text-slate-400 mb-1">الجمهورية / الوزارة</label>
+                            <input type="text" id="input-ministry" value="جمهورية العراق - وزارة التربية" oninput="updatePaper()" class="w-full bg-slate-800 border border-slate-700 rounded-md px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold mb-1">حجم الخط المبدئي</label>
-                            <select id="cfg-font-size" onchange="updateDesign()" class="w-full text-xs p-2 border rounded bg-white">
-                                <option value="fs-small">صغير (12px)</option>
-                                <option value="fs-medium" selected>متوسط (14px)</option>
-                                <option value="fs-large">كبير (16px)</option>
-                                <option value="fs-xlarge">كبير جداً (18px)</option>
-                            </select>
+                            <label class="block text-xs text-slate-400 mb-1">المديرية العامة</label>
+                            <input type="text" id="input-directorate" value="المديرية العامة لتربية النجف الأشرف" oninput="updatePaper()" class="w-full bg-slate-800 border border-slate-700 rounded-md px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
                         </div>
                     </div>
 
-                    <div class="grid grid-cols-2 gap-2">
+                    <div class="grid grid-cols-2 gap-3">
                         <div>
-                            <label class="block text-xs font-semibold mb-1">إطار الصفحة</label>
-                            <select id="cfg-border-style" onchange="updateDesign()" class="w-full text-xs p-2 border rounded bg-white">
-                                <option value="border-double-custom">إطار مزدوج</option>
-                                <option value="border-thick">إطار عريض</option>
-                                <option value="border-thin">إطار رفيع</option>
-                                <option value="border-dashed-custom">إطار مقطع</option>
-                                <option value="border-none">بدون إطار</option>
-                            </select>
+                            <label class="block text-xs text-slate-400 mb-1">اسم المدرسة</label>
+                            <input type="text" id="input-school" value="متوسطة عقيل بن أبي طالب للبنين" oninput="updatePaper()" class="w-full bg-slate-800 border border-slate-700 rounded-md px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold mb-1">الخط الفاصل بين الأسئلة</label>
-                            <select id="cfg-sep-style" onchange="updateDesign()" class="w-full text-xs p-2 border rounded bg-white">
-                                <option value="sep-solid">خط صلب مستقيم</option>
-                                <option value="sep-dashed">خط متقطع (Dashed)</option>
-                                <option value="sep-dotted">خط منقط (Dotted)</option>
-                                <option value="sep-double">خط مزدوج (Double)</option>
-                                <option value="sep-none">بدون خط فاصل</option>
-                            </select>
+                            <label class="block text-xs text-slate-400 mb-1">المادة الدراسية</label>
+                            <input type="text" id="input-subject" value="اللغة العربية" oninput="updatePaper()" class="w-full bg-slate-800 border border-slate-700 rounded-md px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
                         </div>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">الصف / المرحلة</label>
+                            <input type="text" id="input-grade" value="الثاني المتوسط" oninput="updatePaper()" class="w-full bg-slate-800 border border-slate-700 rounded-md px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">عنوان الامتحان</label>
+                            <input type="text" id="input-exam-title" value="امتحانات نهاية السنة" oninput="updatePaper()" class="w-full bg-slate-800 border border-slate-700 rounded-md px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-3 gap-2">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">الدور / الفصل</label>
+                            <input type="text" id="input-round" value="الدور الأول" oninput="updatePaper()" class="w-full bg-slate-800 border border-slate-700 rounded-md px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">العام الدراسي</label>
+                            <input type="text" id="input-year" value="2025 - 2026" oninput="updatePaper()" class="w-full bg-slate-800 border border-slate-700 rounded-md px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">الوقت المخصص</label>
+                            <input type="text" id="input-time" value="ساعتان" oninput="updatePaper()" class="w-full bg-slate-800 border border-slate-700 rounded-md px-2 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- TAB 2: QUESTIONS BUILDER -->
+                <div id="tab-questions" class="space-y-4 hidden">
+                    <div class="flex items-center justify-between">
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">أسئلة الامتحان</h3>
+                        <button onclick="addQuestion()" class="px-3 py-1 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-300 border border-indigo-500/30 rounded-md text-xs font-semibold flex items-center gap-1 transition-all">
+                            <i class="fa-solid fa-plus text-xs"></i> إضافة سؤال
+                        </button>
+                    </div>
+
+                    <div id="questions-form-list" class="space-y-4">
+                        <!-- Dynamic Question Forms insert here -->
+                    </div>
+                </div>
+
+                <!-- TAB 3: NOTES & SIGNATURES -->
+                <div id="tab-footer" class="space-y-4 hidden">
+                    <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider">الملاحظات العامة والفرع التذييلي</h3>
+                    
+                    <div>
+                        <label class="block text-xs text-slate-400 mb-1">ملاحظة أعلى الورقة (تنبيه الطلاب)</label>
+                        <input type="text" id="input-general-note" value="ملاحظة: الإجابة عن جميع الأسئلة (لكل سؤال 20 درجة)" oninput="updatePaper()" class="w-full bg-slate-800 border border-slate-700 rounded-md px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
                     </div>
 
                     <div>
-                        <label class="block text-xs font-semibold mb-1">الخط أسفل الأقسام الرئيسية</label>
-                        <select id="cfg-sec-line-style" onchange="renderPreview()" class="w-full text-xs p-2 border rounded bg-white">
-                            <option value="border-b-2 border-black">خط صلب مستقيم</option>
-                            <option value="border-b-2 border-dashed border-black">خط متقطع (Dashed)</option>
-                            <option value="border-b-2 border-dotted border-black">خط منقط (Dotted)</option>
-                            <option value="border-b-4 border-double border-black">خط مزدوج (Double)</option>
-                            <option value="border-none">بدون خط تحت العنوان</option>
-                        </select>
+                        <label class="block text-xs text-slate-400 mb-1">العبارة الختامية</label>
+                        <input type="text" id="input-wish-note" value="مع أمنياتنا لكم بالنجاح والتوفيق" oninput="updatePaper()" class="w-full bg-slate-800 border border-slate-700 rounded-md px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
                     </div>
-                </div>
 
-                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-3">
-                    <h3 class="font-bold text-xs text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-heading ml-1"></i> الجانب الأيمن (جهة الإدارة)</h3>
-                    <input type="text" id="in-r1" value="إدارة" oninput="updateHeader()" class="w-full text-xs p-2 border rounded">
-                    <input type="text" id="in-r2" value="متوسطة عقيل بن ابي طالب للبنين" oninput="updateHeader()" class="w-full text-xs p-2 border rounded">
-                    <input type="text" id="in-r3" value="للبنين" oninput="updateHeader()" class="w-full text-xs p-2 border rounded">
-                </div>
-
-                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-3">
-                    <h3 class="font-bold text-xs text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-align-center ml-1"></i> منتصف الترويسة (كليشة الامتحان)</h3>
-                    <input type="text" id="in-c1" value="أسئلة امتحان نهاية السنة" oninput="updateHeader()" class="w-full text-xs p-2 border rounded font-bold">
-                    <input type="text" id="in-c2" value="للعام الدراسي 2025-2026" oninput="updateHeader()" class="w-full text-xs p-2 border rounded">
-                    <input type="text" id="in-c3" value="الدور الأول" oninput="updateHeader()" class="w-full text-xs p-2 border rounded">
-                </div>
-
-                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-3">
-                    <h3 class="font-bold text-xs text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-align-left ml-1"></i> الجانب الأيسر (تفاصيل المادة)</h3>
-                    <div class="grid grid-cols-2 gap-2">
-                        <input type="text" id="in-subject" value="اللغة العربية" oninput="updateHeader()" class="text-xs p-2 border rounded" placeholder="المادة">
-                        <input type="text" id="in-class" value="الثاني المتوسط" oninput="updateHeader()" class="text-xs p-2 border rounded" placeholder="الصف">
-                        <input type="text" id="in-time" value="ساعة ونصف" oninput="updateHeader()" class="text-xs p-2 border rounded" placeholder="الوقت">
-                        <input type="text" id="in-date" value="2026/06/15" oninput="updateHeader()" class="text-xs p-2 border rounded" placeholder="التاريخ">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">مدرس / مدرسو المادة</label>
+                            <input type="text" id="input-teacher" value="مدرس المادة" oninput="updatePaper()" class="w-full bg-slate-800 border border-slate-700 rounded-md px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                        </div>
+                        <div>
+                            <label class="block text-xs text-slate-400 mb-1">مدير المدرسة</label>
+                            <input type="text" id="input-headmaster" value="إدارة المدرسة" oninput="updatePaper()" class="w-full bg-slate-800 border border-slate-700 rounded-md px-3 py-1.5 text-xs text-slate-200 focus:outline-none focus:border-indigo-500">
+                        </div>
                     </div>
                 </div>
 
             </div>
+        </aside>
 
-            <!-- TAB 3: NOTES & FOOTER -->
-            <div id="tab-footer" class="space-y-4 hidden">
-                
-                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-3">
-                    <h3 class="font-bold text-xs text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-comment-medical ml-1"></i> الملاحظة العامة (أعلى الورقة)</h3>
-                    <input type="text" id="in-note" value="ملاحظة: الإجابة عن جميع الأسئلة (لكل سؤال 20 درجة)" oninput="updateFooter()" class="w-full text-xs p-2 border rounded font-bold">
+        <!-- MAIN LIVE PREVIEW CANVAS AREA -->
+        <main class="flex-1 bg-slate-950 p-6 overflow-y-auto preview-scroll flex justify-center items-start print-wrapper">
+            
+            <div id="exam-paper" class="a4-paper font-amiri">
+                <div class="paper-border">
+                    
+                    <!-- TOP HEADER SECTION -->
+                    <header class="border-b-2 border-black pb-2 mb-2">
+                        <div class="grid grid-cols-3 text-center items-center">
+                            <!-- Right Column: Ministry & School -->
+                            <div class="text-right paper-header-text leading-tight space-y-0.5">
+                                <p id="paper-ministry" class="font-bold"></p>
+                                <p id="paper-directorate"></p>
+                                <p id="paper-school" class="font-bold"></p>
+                            </div>
+
+                            <!-- Center Column: Exam Main Title -->
+                            <div class="space-y-0.5">
+                                <h2 id="paper-exam-title" class="paper-title-text"></h2>
+                                <p id="paper-round" class="font-bold text-xs"></p>
+                                <p id="paper-year" class="text-xs"></p>
+                            </div>
+
+                            <!-- Left Column: Subject, Grade, Time -->
+                            <div class="text-left paper-header-text leading-tight space-y-0.5">
+                                <p>المادة: <span id="paper-subject" class="font-bold"></span></p>
+                                <p>الصف: <span id="paper-grade"></span></p>
+                                <p>الوقت: <span id="paper-time"></span></p>
+                            </div>
+                        </div>
+
+                        <!-- General Exam Note Line -->
+                        <div id="paper-general-note-container" class="mt-2 text-center border-t border-dashed border-black pt-1">
+                            <p id="paper-general-note" class="font-bold text-xs"></p>
+                        </div>
+                    </header>
+
+                    <!-- QUESTIONS CONTENT AREA -->
+                    <main id="paper-questions-list" class="flex-1 space-y-3">
+                        <!-- Questions will be rendered dynamically here -->
+                    </main>
+
+                    <!-- FOOTER & SIGNATURES SECTION -->
+                    <footer class="mt-2 pt-2 border-t border-black">
+                        <p id="paper-wish-note" class="text-center font-bold text-sm mb-3"></p>
+                        
+                        <div class="flex justify-between items-end px-8 text-xs font-bold">
+                            <div class="text-center">
+                                <p class="mb-6">مدرس المادة</p>
+                                <p id="paper-teacher" class="text-slate-800"></p>
+                            </div>
+                            <div class="text-center">
+                                <p class="mb-6">مدير المدرسة</p>
+                                <p id="paper-headmaster" class="text-slate-800"></p>
+                            </div>
+                        </div>
+                    </footer>
+
                 </div>
-
-                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-3">
-                    <div class="flex justify-between items-center">
-                        <h3 class="font-bold text-xs text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-user-pen ml-1"></i> أسماء مدرسين المادة</h3>
-                        <button onclick="addTeacher()" class="bg-amber-500 hover:bg-amber-600 text-slate-950 text-xs px-2 py-1 rounded font-bold transition flex items-center gap-1">
-                            <i class="fa-solid fa-plus"></i> إضافة مدرس
-                        </button>
-                    </div>
-
-                    <div id="teachers-editor-list" class="space-y-2">
-                        <!-- Teachers Input Items -->
-                    </div>
-                </div>
-
-                <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-3">
-                    <h3 class="font-bold text-xs text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-heart ml-1"></i> العبارة التشجيعية</h3>
-                    <input type="text" id="in-wish" value="تمنياتنا لكم بالنجاح والتوفيق" oninput="updateFooter()" class="w-full text-xs p-2 border rounded">
-                </div>
-
             </div>
 
-        </div>
-
+        </main>
     </div>
 
     <script>
-        let teachers = ["أ. أحمد علي", "أ. حسين كريم"];
-
+        // Initial Default State for Exam Questions
         let examData = {
-            items: [
+            questions: [
                 {
-                    id: 'sec_1',
-                    type: 'section',
-                    title: 'القواعد'
+                    id: 1,
+                    title: "س 1: اشرح عن البنكرياس بالتفصيل مع الرسم واذكر أهم وظائفه.",
+                    score: "20 درجة",
+                    subQuestions: []
                 },
                 {
-                    id: 'q_1',
-                    type: 'question',
-                    num: 'س1',
-                    text: 'اشرح عن البنكرياس بالتفصيل مع الرسم واذكر أهم وظائفه.',
-                    score: '20',
-                    qType: 'essay',
-                    items: [],
-                    subs: []
+                    id: 2,
+                    title: "س 2: أجب عن الأسئلة التالية:",
+                    score: "20 درجة",
+                    subQuestions: [
+                        { label: "أ", text: "عرف ما يلي لثلاث فقط: ( الأنسجة, الأنزيمات, الشرايين, البلعوم )." },
+                        { label: "ب", text: "اختر الإجابة الصحيحة من بين القوسين لما يلي:" },
+                        { label: "1", text: "الماء في الحالة الطبيعية يعتبر مركب (سائل ، صلب ، غاز)." },
+                        { label: "2", text: "يكون الهواء بشكل أساسي من غاز (الأوكسجين ، النيتروجين)." }
+                    ]
                 },
                 {
-                    id: 'q_2',
-                    type: 'question',
-                    num: 'س2',
-                    text: '',
-                    score: '20',
-                    qType: 'essay',
-                    items: [],
-                    subs: [
-                        {
-                            id: 'sub_2_1',
-                            label: 'أ',
-                            text: 'عرف ما يلي لثلاث فقط:',
-                            score: '10',
-                            qType: 'essay',
-                            items: []
-                        },
-                        {
-                            id: 'sub_2_2',
-                            label: 'ب',
-                            text: 'اختر الجواب الصحيح من بين القوسين لما يلي:',
-                            score: '10',
-                            qType: 'mcq',
-                            items: [
-                                { text: 'الماء في الحالة الطبيعية يعتبر مركب ___ (سائل ، صلب ، غاز)' },
-                                { text: 'يتكون الهواء بشكل أساسي من غاز ___ (الأوكسجين ، النيتروجين)' }
-                            ]
-                        }
+                    id: 3,
+                    title: "س 3: علل أربعاً مما يأتي بكتابة السبب العلمي المباشر:",
+                    score: "20 درجة",
+                    subQuestions: [
+                        { label: "1", text: "تسمى العضلات الهيكلية بالعضلات الإرادية." },
+                        { label: "2", text: "وجود الوسائد الغضروفية بين الفقرات العظمية." },
+                        { label: "3", text: "ضرورة ممارسة الرياضة البدنية بشكل منتظم." },
+                        { label: "4", text: "تفرز الغدد العرقية العرق عند ارتفاع حرارة الجسم." }
                     ]
                 }
             ]
         };
 
-        window.onload = function() {
-            renderTeachersEditor();
-            renderEditor();
-            renderPreview();
-        };
-
-        function switchTab(tabId) {
-            ['tab-general', 'tab-questions', 'tab-footer'].forEach(id => {
-                document.getElementById(id).classList.add('hidden');
+        // Tab Switching Logic
+        function switchTab(tabName) {
+            ['header', 'questions', 'footer'].forEach(t => {
+                document.getElementById(`tab-${t}`).classList.add('hidden');
+                document.getElementById(`tab-btn-${t}`).classList.remove('border-indigo-500', 'text-indigo-400');
+                document.getElementById(`tab-btn-${t}`).classList.add('border-transparent', 'text-slate-400');
             });
-            document.getElementById(tabId).classList.remove('hidden');
 
-            document.querySelectorAll('[id^="btn-tab-"]').forEach(btn => {
-                btn.className = "flex-1 py-2 text-center text-gray-500 hover:text-gray-700";
-            });
-            document.getElementById('btn-' + tabId).className = "flex-1 py-2 text-center border-b-2 border-amber-500 text-amber-600 font-bold";
+            document.getElementById(`tab-${tabName}`).classList.remove('hidden');
+            document.getElementById(`tab-btn-${tabName}`).classList.add('border-indigo-500', 'text-indigo-400');
+            document.getElementById(`tab-btn-${tabName}`).classList.remove('border-transparent', 'text-slate-400');
         }
 
-        function updateHeader() {
-            document.getElementById('pv-right-1').innerText = document.getElementById('in-r1').value;
-            document.getElementById('pv-right-2').innerText = document.getElementById('in-r2').value;
-            document.getElementById('pv-right-3').innerText = document.getElementById('in-r3').value;
-
-            document.getElementById('pv-center-1').innerText = document.getElementById('in-c1').value;
-            document.getElementById('pv-center-2').innerText = document.getElementById('in-c2').value;
-            document.getElementById('pv-center-3').innerText = document.getElementById('in-c3').value;
-
-            document.getElementById('pv-left-subject').innerText = document.getElementById('in-subject').value;
-            document.getElementById('pv-left-class').innerText = document.getElementById('in-class').value;
-            document.getElementById('pv-left-time').innerText = document.getElementById('in-time').value;
-            document.getElementById('pv-left-date').innerText = document.getElementById('in-date').value;
-            autoFitA4Sheet();
-        }
-
-        function updateFooter() {
-            document.getElementById('pv-note').innerText = document.getElementById('in-note').value;
-            document.getElementById('pv-wish').innerText = document.getElementById('in-wish').value;
-            renderTeachersPreview();
-            autoFitA4Sheet();
-        }
-
-        function addTeacher() {
-            teachers.push("أ. اسم المدرس");
-            renderTeachersEditor();
-            renderTeachersPreview();
-            autoFitA4Sheet();
-        }
-
-        function deleteTeacher(index) {
-            if (teachers.length > 1) {
-                teachers.splice(index, 1);
-                renderTeachersEditor();
-                renderTeachersPreview();
-                autoFitA4Sheet();
-            }
-        }
-
-        function renderTeachersEditor() {
-            const container = document.getElementById('teachers-editor-list');
+        // Render Questions Control Forms in Sidebar
+        function renderQuestionsForm() {
+            const container = document.getElementById('questions-form-list');
             container.innerHTML = '';
-            teachers.forEach((tName, idx) => {
-                const div = document.createElement('div');
-                div.className = "flex items-center gap-2";
-                div.innerHTML = `
-                    <span class="text-xs font-bold text-slate-500 w-16">${idx + 1}. المدرس:</span>
-                    <input type="text" value="${tName}" oninput="teachers[${idx}] = this.value; renderTeachersPreview();" class="flex-1 text-xs p-2 border rounded">
-                    ${teachers.length > 1 ? `<button onclick="deleteTeacher(${idx})" class="text-red-500 hover:text-red-700 text-xs p-1"><i class="fa-solid fa-trash"></i></button>` : ''}
+
+            examData.questions.forEach((q, qIndex) => {
+                const qEl = document.createElement('div');
+                qEl.className = 'bg-slate-800/60 border border-slate-700/80 rounded-lg p-3 space-y-2';
+                
+                let subQuestionsHtml = '';
+                q.subQuestions.forEach((sub, subIndex) => {
+                    subQuestionsHtml += `
+                        <div class="flex items-center gap-1.5 mt-1.5">
+                            <input type="text" value="${sub.label}" onchange="updateSubQuestionLabel(${qIndex}, ${subIndex}, this.value)" class="w-10 bg-slate-900 border border-slate-700 rounded px-1.5 py-1 text-xs text-center text-indigo-300">
+                            <input type="text" value="${sub.text}" onchange="updateSubQuestionText(${qIndex}, ${subIndex}, this.value)" class="flex-1 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-slate-200">
+                            <button onclick="removeSubQuestion(${qIndex}, ${subIndex})" class="text-rose-400 hover:text-rose-300 px-1"><i class="fa-solid fa-times text-xs"></i></button>
+                        </div>
+                    `;
+                });
+
+                qEl.innerHTML = `
+                    <div class="flex items-center justify-between gap-2">
+                        <span class="text-xs font-bold text-indigo-400">سؤال ${qIndex + 1}</span>
+                        <button onclick="removeQuestion(${qIndex})" class="text-xs text-rose-400 hover:text-rose-300">
+                            <i class="fa-solid fa-trash-can"></i> حذف
+                        </button>
+                    </div>
+                    <div>
+                        <input type="text" value="${q.title}" oninput="updateQuestionTitle(${qIndex}, this.value)" class="w-full bg-slate-900 border border-slate-700 rounded px-2.5 py-1.5 text-xs text-slate-100 font-medium">
+                    </div>
+                    <div class="flex items-center justify-between gap-2 pt-1">
+                        <div class="flex items-center gap-2">
+                            <span class="text-[11px] text-slate-400">الدرجة:</span>
+                            <input type="text" value="${q.score}" oninput="updateQuestionScore(${qIndex}, this.value)" class="w-20 bg-slate-900 border border-slate-700 rounded px-2 py-1 text-xs text-slate-200">
+                        </div>
+                        <button onclick="addSubQuestion(${qIndex})" class="text-[11px] bg-slate-700 hover:bg-slate-600 text-slate-200 px-2 py-1 rounded">
+                            + فرع / نقطة
+                        </button>
+                    </div>
+                    <div class="pr-2 border-r-2 border-indigo-500/30">
+                        ${subQuestionsHtml}
+                    </div>
                 `;
-                container.appendChild(div);
+                container.appendChild(qEl);
             });
         }
 
-        function renderTeachersPreview() {
-            const labelEl = document.getElementById('pv-teacher-label');
-            const listEl = document.getElementById('pv-teachers-list');
-
-            if (teachers.length > 1) {
-                labelEl.innerText = "مدرسا المادة:";
-            } else {
-                labelEl.innerText = "مدرس المادة:";
-            }
-
-            listEl.innerHTML = '';
-            teachers.forEach((name) => {
-                const span = document.createElement('span');
-                span.className = "font-semibold";
-                span.innerText = name;
-                listEl.appendChild(span);
-            });
-        }
-
-        function updateDesign() {
-            const sheet = document.getElementById('exam-sheet');
-            
-            sheet.className = sheet.className.replace(/font-\w+/g, '');
-            sheet.classList.add(document.getElementById('cfg-font-family').value);
-
-            sheet.className = sheet.className.replace(/fs-\w+/g, '');
-            sheet.classList.add(document.getElementById('cfg-font-size').value);
-
-            sheet.className = sheet.className.replace(/border-\w+|-custom/g, '');
-            sheet.classList.add(document.getElementById('cfg-border-style').value);
-
-            renderPreview();
-        }
-
-        function addMainSection() {
-            examData.items.push({
-                id: 'sec_' + Date.now(),
-                type: 'section',
-                title: 'عنوان القسم الجديد (مثال: القواعد)'
-            });
-            renderEditor();
-            renderPreview();
-        }
-
+        // Add/Remove Question Handlers
         function addQuestion() {
-            const qCount = examData.items.filter(i => i.type === 'question').length + 1;
-            examData.items.push({
-                id: 'q_' + Date.now(),
-                type: 'question',
-                num: 'س' + qCount,
-                text: 'اكتب نص السؤال هنا...',
-                score: '20',
-                qType: 'essay',
-                items: [],
-                subs: []
+            const newId = examData.questions.length + 1;
+            examData.questions.push({
+                id: newId,
+                title: `س ${newId}: اكتب نص السؤال الجديد هنا...`,
+                score: "20 درجة",
+                subQuestions: []
             });
-            renderEditor();
-            renderPreview();
+            renderQuestionsForm();
+            updatePaper();
+        }
+
+        function removeQuestion(index) {
+            examData.questions.splice(index, 1);
+            renderQuestionsForm();
+            updatePaper();
         }
 
         function addSubQuestion(qIndex) {
-            const labels = ['أ', 'ب', 'جـ', 'د', 'هـ', 'و'];
-            const currentSubs = examData.items[qIndex].subs;
-            const nextLabel = labels[currentSubs.length] || ('فرع ' + (currentSubs.length + 1));
-
-            currentSubs.push({
-                id: 'sub_' + Date.now(),
-                label: nextLabel,
-                text: 'اكتب الفرع الجديد هنا...',
-                score: '10',
-                qType: 'essay',
-                items: []
+            examData.questions[qIndex].subQuestions.push({
+                label: "أ",
+                text: "فرع جديد أو نقطة فرعية جديدة..."
             });
-            renderEditor();
-            renderPreview();
+            renderQuestionsForm();
+            updatePaper();
         }
 
-        function addQuestionItem(qIndex) {
-            examData.items[qIndex].items.push({ text: 'اكتب العبارة أو الاختيار هنا...' });
-            renderEditor();
-            renderPreview();
+        function removeSubQuestion(qIndex, subIndex) {
+            examData.questions[qIndex].subQuestions.splice(subIndex, 1);
+            renderQuestionsForm();
+            updatePaper();
         }
 
-        function addSubItem(qIndex, subIndex) {
-            examData.items[qIndex].subs[subIndex].items.push({ text: 'اكتب العبارة أو الاختيار هنا...' });
-            renderEditor();
-            renderPreview();
+        function updateQuestionTitle(index, val) {
+            examData.questions[index].title = val;
+            updatePaper();
         }
 
-        function deleteItem(index) {
-            examData.items.splice(index, 1);
-            renderEditor();
-            renderPreview();
+        function updateQuestionScore(index, val) {
+            examData.questions[index].score = val;
+            updatePaper();
         }
 
-        function deleteSubQuestion(qIndex, subIndex) {
-            examData.items[qIndex].subs.splice(subIndex, 1);
-            calculateQuestionScore(qIndex);
-            renderEditor();
-            renderPreview();
+        function updateSubQuestionLabel(qIndex, subIndex, val) {
+            examData.questions[qIndex].subQuestions[subIndex].label = val;
+            updatePaper();
         }
 
-        function deleteQuestionItem(qIndex, itemIndex) {
-            examData.items[qIndex].items.splice(itemIndex, 1);
-            renderEditor();
-            renderPreview();
+        function updateSubQuestionText(qIndex, subIndex, val) {
+            examData.questions[qIndex].subQuestions[subIndex].text = val;
+            updatePaper();
         }
 
-        function deleteSubItem(qIndex, subIndex, itemIndex) {
-            examData.items[qIndex].subs[subIndex].items.splice(itemIndex, 1);
-            renderEditor();
-            renderPreview();
-        }
+        // Synchronize Form Input Values to A4 Paper DOM
+        function updatePaper() {
+            // Header
+            document.getElementById('paper-ministry').innerText = document.getElementById('input-ministry').value;
+            document.getElementById('paper-directorate').innerText = document.getElementById('input-directorate').value;
+            document.getElementById('paper-school').innerText = document.getElementById('input-school').value;
+            document.getElementById('paper-subject').innerText = document.getElementById('input-subject').value;
+            document.getElementById('paper-grade').innerText = document.getElementById('input-grade').value;
+            document.getElementById('paper-exam-title').innerText = document.getElementById('input-exam-title').value;
+            document.getElementById('paper-round').innerText = document.getElementById('input-round').value;
+            document.getElementById('paper-year').innerText = document.getElementById('input-year').value;
+            document.getElementById('paper-time').innerText = document.getElementById('input-time').value;
 
-        function calculateQuestionScore(qIndex) {
-            const question = examData.items[qIndex];
-            if (question.subs && question.subs.length > 0) {
-                let total = 0;
-                question.subs.forEach(s => {
-                    total += parseFloat(s.score) || 0;
-                });
-                question.score = total;
-                const scoreInput = document.getElementById(`q-score-input-${qIndex}`);
-                if (scoreInput) scoreInput.value = total;
+            // Notes & Signatures
+            const noteVal = document.getElementById('input-general-note').value;
+            const noteContainer = document.getElementById('paper-general-note-container');
+            if (noteVal.trim()) {
+                noteContainer.style.display = 'block';
+                document.getElementById('paper-general-note').innerText = noteVal;
+            } else {
+                noteContainer.style.display = 'none';
             }
-            renderPreview();
-        }
 
-        function renderEditor() {
-            const container = document.getElementById('questions-editor-list');
-            container.innerHTML = '';
+            document.getElementById('paper-wish-note').innerText = document.getElementById('input-wish-note').value;
+            document.getElementById('paper-teacher').innerText = document.getElementById('input-teacher').value;
+            document.getElementById('paper-headmaster').innerText = document.getElementById('input-headmaster').value;
 
-            examData.items.forEach((item, index) => {
-                if (item.type === 'section') {
-                    const secDiv = document.createElement('div');
-                    secDiv.className = "bg-amber-50 p-2.5 rounded-lg border border-amber-300 flex items-center justify-between gap-2 shadow-sm";
-                    secDiv.innerHTML = `
-                        <div class="flex items-center gap-2 flex-1">
-                            <i class="fa-solid fa-folder text-amber-600"></i>
-                            <input type="text" value="${item.title}" oninput="examData.items[${index}].title = this.value; renderPreview();" class="w-full text-xs p-1.5 border rounded font-bold" placeholder="عنوان القسم">
-                        </div>
-                        <button onclick="deleteItem(${index})" class="text-red-500 hover:text-red-700 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
-                    `;
-                    container.appendChild(secDiv);
-                } else if (item.type === 'question') {
-                    const qDiv = document.createElement('div');
-                    qDiv.className = "bg-slate-50 p-3 rounded-lg border border-slate-300 space-y-3 shadow-sm";
-                    
-                    let mainQuestionItemsHtml = '';
-                    if ((item.qType === 'mcq' || item.qType === 'tf') && item.subs.length === 0) {
-                        mainQuestionItemsHtml = `<div class="mt-2 space-y-1 pr-4 border-r-2 border-slate-300">`;
-                        item.items.forEach((qItem, itemIdx) => {
-                            mainQuestionItemsHtml += `
-                                <div class="flex items-center gap-1">
-                                    <span class="text-xs font-bold text-gray-500">${itemIdx + 1}.</span>
-                                    <input type="text" value="${qItem.text}" oninput="examData.items[${index}].items[${itemIdx}].text = this.value; renderPreview();" class="flex-1 text-xs p-1 border rounded" placeholder="نص الفقرة...">
-                                    <button onclick="deleteQuestionItem(${index}, ${itemIdx})" class="text-red-400 text-xs"><i class="fa-solid fa-xmark"></i></button>
-                                </div>
-                            `;
-                        });
-                        mainQuestionItemsHtml += `
-                            <button onclick="addQuestionItem(${index})" class="text-xs text-blue-600 hover:underline mt-1">+ إضافة فقرة</button>
-                        </div>`;
-                    }
+            // Render Questions List on Paper
+            const listEl = document.getElementById('paper-questions-list');
+            listEl.innerHTML = '';
 
-                    let subsHtml = '';
-                    item.subs.forEach((sub, subIdx) => {
-                        let itemsListHtml = '';
-                        if (sub.qType === 'mcq' || sub.qType === 'tf') {
-                            itemsListHtml = `<div class="mt-2 space-y-1 pr-4 border-r-2 border-slate-300">`;
-                            sub.items.forEach((subItem, itemIdx) => {
-                                itemsListHtml += `
-                                    <div class="flex items-center gap-1">
-                                        <span class="text-xs font-bold text-gray-500">${itemIdx + 1}.</span>
-                                        <input type="text" value="${subItem.text}" oninput="examData.items[${index}].subs[${subIdx}].items[${itemIdx}].text = this.value; renderPreview();" class="flex-1 text-xs p-1 border rounded" placeholder="نص الفقرة...">
-                                        <button onclick="deleteSubItem(${index}, ${subIdx}, ${itemIdx})" class="text-red-400 text-xs"><i class="fa-solid fa-xmark"></i></button>
-                                    </div>
-                                `;
-                            });
-                            itemsListHtml += `
-                                <button onclick="addSubItem(${index}, ${subIdx})" class="text-xs text-blue-600 hover:underline mt-1">+ إضافة فقرة فرعية</button>
-                            </div>`;
-                        }
+            examData.questions.forEach((q) => {
+                const qDiv = document.createElement('div');
+                qDiv.className = 'question-item';
 
-                        subsHtml += `
-                            <div class="bg-white p-2.5 rounded border border-gray-200 space-y-2">
-                                <div class="flex items-center gap-2">
-                                    <input type="text" value="${sub.label}" oninput="examData.items[${index}].subs[${subIdx}].label = this.value; renderPreview();" class="w-12 text-xs p-1 border rounded text-center font-bold" placeholder="أ">
-                                    <input type="text" value="${sub.text}" oninput="examData.items[${index}].subs[${subIdx}].text = this.value; renderPreview();" class="flex-1 text-xs p-1 border rounded" placeholder="نص الفرع...">
-                                    <input type="text" value="${sub.score}" oninput="examData.items[${index}].subs[${subIdx}].score = this.value; calculateQuestionScore(${index});" class="w-14 text-xs p-1 border rounded text-center" placeholder="درجة">
-                                    <button onclick="deleteSubQuestion(${index}, ${subIdx})" class="text-red-500 text-xs"><i class="fa-solid fa-trash"></i></button>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <label class="text-[11px] text-gray-500">نوع الأسئلة الفرعية:</label>
-                                    <select onchange="examData.items[${index}].subs[${subIdx}].qType = this.value; renderEditor(); renderPreview();" class="text-xs p-1 border rounded bg-gray-50">
-                                        <option value="essay" ${sub.qType === 'essay' ? 'selected' : ''}>نص طويل / مقالي</option>
-                                        <option value="mcq" ${sub.qType === 'mcq' ? 'selected' : ''}>اختيارات من متعدد</option>
-                                        <option value="tf" ${sub.qType === 'tf' ? 'selected' : ''}>صح وخطأ</option>
-                                    </select>
-                                </div>
-                                ${itemsListHtml}
+                let subHtml = '';
+                if (q.subQuestions && q.subQuestions.length > 0) {
+                    subHtml = `<div class="pr-4 space-y-1 mt-1">`;
+                    q.subQuestions.forEach(sub => {
+                        subHtml += `
+                            <div class="subquestion-item flex items-start gap-2">
+                                <span class="font-bold">${sub.label})</span>
+                                <span class="flex-1">${sub.text}</span>
                             </div>
                         `;
                     });
-
-                    let mainQuestionControls = '';
-                    if (item.subs.length === 0) {
-                        mainQuestionControls = `
-                            <div class="space-y-2 bg-white p-2 rounded border border-gray-200">
-                                <input type="text" value="${item.text}" oninput="examData.items[${index}].text = this.value; renderPreview();" class="w-full text-xs p-1.5 border rounded" placeholder="نص السؤال المباشر...">
-                                <div class="flex items-center gap-2">
-                                    <label class="text-[11px] text-gray-500">نوع السؤال:</label>
-                                    <select onchange="examData.items[${index}].qType = this.value; renderEditor(); renderPreview();" class="text-xs p-1 border rounded bg-gray-50">
-                                        <option value="essay" ${item.qType === 'essay' ? 'selected' : ''}>نص طويل / مقالي</option>
-                                        <option value="mcq" ${item.qType === 'mcq' ? 'selected' : ''}>اختيارات من متعدد</option>
-                                        <option value="tf" ${item.qType === 'tf' ? 'selected' : ''}>صح وخطأ</option>
-                                    </select>
-                                </div>
-                                ${mainQuestionItemsHtml}
-                            </div>
-                        `;
-                    }
-
-                    qDiv.innerHTML = `
-                        <div class="flex items-center justify-between border-b pb-2 gap-2">
-                            <div class="flex items-center gap-2 flex-1">
-                                <input type="text" value="${item.num}" oninput="examData.items[${index}].num = this.value; renderPreview();" class="w-16 text-xs p-1 border rounded font-bold text-center">
-                                <span class="text-xs text-gray-500 font-semibold">${item.subs.length > 0 ? '(أفرع)' : '(مباشر)'}</span>
-                            </div>
-                            <div class="flex items-center gap-1">
-                                <span class="text-xs font-bold">الدرجة:</span>
-                                <input type="text" id="q-score-input-${index}" value="${item.score}" oninput="examData.items[${index}].score = this.value; renderPreview();" class="w-12 text-xs p-1 border rounded text-center font-bold bg-amber-50">
-                                <button onclick="deleteItem(${index})" class="text-red-500 hover:text-red-700 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
-                            </div>
-                        </div>
-                        ${mainQuestionControls}
-                        <div class="space-y-2">
-                            ${subsHtml}
-                        </div>
-                        <button onclick="addSubQuestion(${index})" class="w-full py-1 text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 rounded text-center font-semibold transition">
-                            + إضافة فرع للسؤال
-                        </button>
-                    `;
-                    container.appendChild(qDiv);
+                    subHtml += `</div>`;
                 }
-            });
-        }
 
-        function renderPreview() {
-            const container = document.getElementById('pv-questions-container');
-            const sepClass = document.getElementById('cfg-sep-style').value;
-            const secLineClass = document.getElementById('cfg-sec-line-style').value;
-            container.innerHTML = '';
-
-            examData.items.forEach((item) => {
-                if (item.type === 'section') {
-                    const secBlock = document.createElement('div');
-                    secBlock.className = "text-center my-1";
-                    secBlock.innerHTML = `
-                        <span class="font-bold px-4 py-0.5 inline-block ${secLineClass}">[ ${item.title} ]</span>
-                    `;
-                    container.appendChild(secBlock);
-                } else if (item.type === 'question') {
-                    const qBlock = document.createElement('div');
-                    qBlock.className = `pb-1 ${sepClass}`;
-
-                    let scoreStr = item.score ? `(${item.score} درجة)` : '';
-                    let contentHtml = '';
-
-                    if (item.subs.length === 0) {
-                        let mainItemsRender = '';
-                        if ((item.qType === 'mcq' || item.qType === 'tf') && item.items.length > 0) {
-                            mainItemsRender = '<ol class="list-decimal list-inside pr-4 space-y-0.5 my-1">';
-                            item.items.forEach(it => {
-                                mainItemsRender += `<li>${it.text}</li>`;
-                            });
-                            mainItemsRender += '</ol>';
-                        }
-
-                        contentHtml = `
-                            <div class="flex justify-between items-start">
-                                <div class="flex-1"><span class="font-bold">${item.num}:</span> ${item.text}</div>
-                                <span class="font-bold text-xs whitespace-nowrap mr-2">${scoreStr}</span>
-                            </div>
-                            ${mainItemsRender}
-                        `;
-                    } else {
-                        let subsHtml = '';
-                        item.subs.forEach(sub => {
-                            let subScore = sub.score ? `(${sub.score} د)` : '';
-                            let itemsRender = '';
-                            if ((sub.qType === 'mcq' || sub.qType === 'tf') && sub.items.length > 0) {
-                                itemsRender = '<ol class="list-decimal list-inside pr-4 space-y-0.5 my-1">';
-                                sub.items.forEach(it => {
-                                    itemsRender += `<li>${it.text}</li>`;
-                                });
-                                itemsRender += '</ol>';
-                            }
-
-                            subsHtml += `
-                                <div class="mt-0.5">
-                                    <div class="flex justify-between items-start">
-                                        <div class="flex-1">
-                                            <span class="font-bold">${sub.label})</span> ${sub.text}
-                                        </div>
-                                        <span class="text-xs font-bold mr-2 whitespace-nowrap">${subScore}</span>
-                                    </div>
-                                    ${itemsRender}
-                                </div>
-                            `;
-                        });
-
-                        contentHtml = `
-                            <div class="flex justify-between items-start">
-                                <div class="flex-1"><span class="font-bold">${item.num}:</span> ${item.text}</div>
-                                <span class="font-bold text-xs whitespace-nowrap mr-2">${scoreStr}</span>
-                            </div>
-                            <div class="space-y-0.5 mt-0.5">
-                                ${subsHtml}
-                            </div>
-                        `;
-                    }
-
-                    qBlock.innerHTML = contentHtml;
-                    container.appendChild(qBlock);
-                }
+                qDiv.innerHTML = `
+                    <div class="flex justify-between items-baseline font-bold border-b border-gray-200 pb-0.5">
+                        <span class="text-black">${q.title}</span>
+                        <span class="text-xs whitespace-nowrap mr-2">(${q.score})</span>
+                    </div>
+                    ${subHtml}
+                `;
+                listEl.appendChild(qDiv);
             });
 
-            renderTeachersPreview();
-            setTimeout(autoFitA4Sheet, 20);
+            // Trigger Layout Auto-Fit Check
+            autoFitLayout();
         }
 
-        /* DYNAMIC AUTO-FIT SINGLE PAGE SCALER */
-        function autoFitA4Sheet() {
-            const wrapper = document.getElementById('a4-sheet-wrapper');
-            const sheet = document.getElementById('exam-sheet');
-            const innerBody = document.getElementById('exam-inner-body');
-            const footer = document.getElementById('exam-footer');
-            const scaleBadge = document.getElementById('scale-value');
+        function autoFitLayout() {
+            const paper = document.getElementById('exam-paper');
+            const badge = document.getElementById('status-badge');
+            const statusText = document.getElementById('status-text');
 
-            if (!wrapper || !sheet) return;
+            // Reset compact classes first
+            paper.classList.remove('compact-level-1', 'compact-level-2', 'compact-level-3');
 
-            // Reset scale for accurate calculation
-            sheet.style.transform = 'scale(1)';
+            // Maximum allowed scroll height for printable inner area (~1120px on screen scale)
+            const maxAllowedHeight = paper.clientHeight;
 
-            const maxHeight = wrapper.clientHeight; // Exact A4 height limit
-            const totalContentHeight = innerBody.scrollHeight + footer.offsetHeight + 30; // Includes padding buffer
+            if (paper.scrollHeight > maxAllowedHeight) {
+                // Apply Level 1 Compact
+                paper.classList.add('compact-level-1');
+            }
 
-            if (totalContentHeight > maxHeight) {
-                let scale = maxHeight / totalContentHeight;
-                
-                // Absolute minimum safety scale (0.4)
-                if (scale < 0.4) scale = 0.4;
+            if (paper.scrollHeight > maxAllowedHeight) {
+                // Apply Level 2 Compact
+                paper.classList.remove('compact-level-1');
+                paper.classList.add('compact-level-2');
+            }
 
-                sheet.style.transform = `scale(${scale})`;
-                if (scaleBadge) scaleBadge.innerText = Math.round(scale * 100) + '%';
+            if (paper.scrollHeight > maxAllowedHeight) {
+                // Apply Level 3 Compact
+                paper.classList.remove('compact-level-2');
+                paper.classList.add('compact-level-3');
+            }
+
+            // Check if still overflowing even after Level 3
+            if (paper.scrollHeight > maxAllowedHeight) {
+                badge.className = "px-3 py-1 rounded-full text-xs font-semibold bg-rose-500/10 text-rose-400 border border-rose-500/20 flex items-center gap-2";
+                statusText.innerText = "تحذير: الأسئلة كثيرة جداً وقد تتجاوز الصفحة الواحدة";
             } else {
-                sheet.style.transform = 'scale(1)';
-                if (scaleBadge) scaleBadge.innerText = '100%';
+                badge.className = "px-3 py-1 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-2";
+                statusText.innerText = "حالة الورقة: A4 صفحة واحدة متناسقة";
             }
         }
 
+        // Trigger standard browser print window
         function triggerPrint() {
-            autoFitA4Sheet();
-            setTimeout(() => {
-                window.print();
-            }, 100);
+            window.print();
         }
 
-        window.addEventListener('resize', autoFitA4Sheet);
-
-        function resetData() {
-            if (confirm("هل أنت تأكد من إعادة ضبط كافة البيانات؟")) {
-                location.reload();
-            }
-        }
+        // Initialize Application
+        window.onload = function() {
+            renderQuestionsForm();
+            updatePaper();
+        };
     </script>
 </body>
 </html>
