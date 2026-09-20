@@ -39,12 +39,12 @@
             align-items: flex-start;
         }
 
-        /* A4 Page Simulation Styling */
+        /* A4 Page Simulation Styling - Strict A4 Constraints */
         .a4-page {
             width: 210mm;
-            min-height: 297mm;
-            height: auto;
-            padding: 8mm;
+            height: 297mm;
+            max-height: 297mm;
+            padding: 7mm 10mm;
             margin: 0 auto;
             background: white;
             box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3);
@@ -54,6 +54,7 @@
             display: flex;
             flex-direction: column;
             justify-content: space-between;
+            overflow: hidden;
         }
 
         /* Border Styles */
@@ -65,16 +66,16 @@
 
         /* Font Sizes */
         .fs-small { font-size: 13px; line-height: 1.4; }
-        .fs-medium { font-size: 15px; line-height: 1.5; }
-        .fs-large { font-size: 17px; line-height: 1.5; }
-        .fs-xlarge { font-size: 19px; line-height: 1.6; }
+        .fs-medium { font-size: 15px; line-height: 1.45; }
+        .fs-large { font-size: 16.5px; line-height: 1.5; }
+        .fs-xlarge { font-size: 18px; line-height: 1.55; }
 
         /* Separator Line Styles */
         .sep-none { border-bottom: none; }
-        .sep-solid { border-bottom: 1.5px solid #000; }
-        .sep-dashed { border-bottom: 1.5px dashed #000; }
-        .sep-dotted { border-bottom: 2px dotted #000; }
-        .sep-double { border-bottom: 3.5px double #000; }
+        .sep-solid { border-bottom: 1px solid #000; }
+        .sep-dashed { border-bottom: 1px dashed #000; }
+        .sep-dotted { border-bottom: 1.5px dotted #000; }
+        .sep-double { border-bottom: 3px double #000; }
 
         @media (max-width: 1024px) {
             .app-container {
@@ -87,11 +88,12 @@
             }
             .a4-page {
                 width: 100%;
-                min-height: auto;
+                height: auto;
+                max-height: none;
             }
         }
 
-        /* Direct & Unrestricted Print Media Styles */
+        /* Direct & Unrestricted Print Media Styles - Fixed Overflow & Height */
         @media print {
             @page {
                 size: A4 portrait;
@@ -104,7 +106,8 @@
                 margin: 0 !important;
                 width: 210mm !important;
                 height: 297mm !important;
-                overflow: visible !important;
+                max-height: 297mm !important;
+                overflow: hidden !important;
             }
 
             .no-print {
@@ -113,15 +116,16 @@
 
             .app-container {
                 display: block !important;
-                height: auto !important;
-                overflow: visible !important;
+                height: 297mm !important;
+                max-height: 297mm !important;
+                overflow: hidden !important;
             }
 
             .preview-pane {
                 background: white !important;
                 padding: 0 !important;
                 margin: 0 !important;
-                overflow: visible !important;
+                overflow: hidden !important;
                 display: block !important;
             }
 
@@ -130,7 +134,7 @@
                 width: 210mm !important;
                 height: 297mm !important;
                 max-height: 297mm !important;
-                padding: 8mm !important;
+                padding: 7mm 10mm !important;
                 margin: 0 !important;
                 box-sizing: border-box !important;
                 page-break-after: avoid !important;
@@ -151,7 +155,7 @@
             <i class="fa-solid fa-file-pen text-amber-400 text-2xl"></i>
             <div>
                 <h1 class="font-bold text-lg leading-tight">منشئ الأسئلة الامتحانية الاحترافي</h1>
-                <p class="text-xs text-slate-400">صمم واطبع أسئلتك بسهولة وتنسيق عالي الدقة ( تصميم الاستاذ علي سالم هادي - متوسطة عقيل بن ابي طالب للبنين )</p>
+                <p class="text-xs text-slate-400">صمم واطبع أسئلتك بسهولة وتنسيق عالي الدقة ( إعداد الاستاذ علي سالم هادي )</p>
             </div>
         </div>
         <div class="flex items-center gap-2">
@@ -174,17 +178,17 @@
             <div id="exam-sheet" class="a4-page font-amiri border-double-custom fs-medium">
                 <div>
                     <!-- Header Section (الترويسة) -->
-                    <div class="grid grid-cols-3 items-center text-center border-b pb-2 mb-2 border-black">
+                    <div class="grid grid-cols-3 items-center text-center border-b pb-1.5 mb-2 border-black">
                         <!-- Right Column -->
                         <div class="text-right space-y-0.5">
-                            <div id="pv-right-1" class="font-bold">إدارة</div>
-                            <div id="pv-right-2">اسم المدرسة هنا</div>
+                            <div id="pv-right-1" class="font-bold">إدارة المدرسة</div>
+                            <div id="pv-right-2">اسم المدرسة</div>
                             <div id="pv-right-3" class="text-xs">للبنين / للبنات</div>
                         </div>
 
                         <!-- Center Column -->
                         <div class="text-center space-y-0.5">
-                            <div id="pv-center-1" class="font-bold text-lg">أسئلة امتحان نهاية السنة</div>
+                            <div id="pv-center-1" class="font-bold text-lg">أسئلة الامتحان النهائي</div>
                             <div id="pv-center-2" class="text-xs">للعام الدراسي 2025-2026</div>
                             <div id="pv-center-3" class="text-xs">الدور الأول</div>
                         </div>
@@ -199,18 +203,18 @@
                     </div>
 
                     <!-- General Note (الملاحظة العامة) -->
-                    <div id="pv-note-box" class="mb-3 text-center">
-                        <p id="pv-note" class="font-bold border-b border-black pb-0.5 inline-block">ملاحظة: الإجابة عن جميع الأسئلة (لكل سؤال 20 درجة)</p>
+                    <div id="pv-note-box" class="mb-2 text-center">
+                        <p id="pv-note" class="font-bold border-b border-black pb-0.5 inline-block"></p>
                     </div>
 
                     <!-- Dynamic Sections & Questions Container -->
-                    <div id="pv-questions-container" class="space-y-3">
+                    <div id="pv-questions-container" class="space-y-2.5">
                         <!-- Dynamic Content Rendered via JS -->
                     </div>
                 </div>
 
                 <!-- Footer Section (التذييل) -->
-                <div class="mt-4 pt-2 border-t border-black">
+                <div class="mt-2 pt-1.5 border-t border-black">
                     <div class="flex justify-between items-end">
                         <div class="font-bold flex items-center gap-2">
                             <span id="pv-teacher-label">مدرس المادة:</span>
@@ -258,8 +262,8 @@
                             <select id="cfg-font-size" onchange="updateDesign()" class="w-full text-xs p-2 border rounded">
                                 <option value="fs-small">صغير (13px)</option>
                                 <option value="fs-medium" selected>متوسط (15px)</option>
-                                <option value="fs-large">كبير (17px)</option>
-                                <option value="fs-xlarge">كبير جداً (19px)</option>
+                                <option value="fs-large">كبير (16.5px)</option>
+                                <option value="fs-xlarge">كبير جداً (18px)</option>
                             </select>
                         </div>
                     </div>
@@ -299,28 +303,28 @@
                     </div>
                 </div>
 
-                <!-- Header Details -->
+                <!-- Header Details with Placeholders -->
                 <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-3">
                     <h3 class="font-bold text-xs text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-heading ml-1"></i> الجانب الأيمن (جهة الإدارة)</h3>
-                    <input type="text" id="in-r1" value="إدارة" oninput="updateHeader()" class="w-full text-xs p-2 border rounded" placeholder="السطر الأول">
-                    <input type="text" id="in-r2" value="اسم المدرسة هنا" oninput="updateHeader()" class="w-full text-xs p-2 border rounded" placeholder="اسم المدرسة">
-                    <input type="text" id="in-r3" value="للبنين" oninput="updateHeader()" class="w-full text-xs p-2 border rounded" placeholder="السطر الثالث">
+                    <input type="text" id="in-r1" oninput="updateHeader()" class="w-full text-xs p-2 border rounded" placeholder="إدارة التربية / التربية والتعليم">
+                    <input type="text" id="in-r2" oninput="updateHeader()" class="w-full text-xs p-2 border rounded" placeholder="اسم المدرسة (مثال: متوسطة عقيل بن أبي طالب)">
+                    <input type="text" id="in-r3" oninput="updateHeader()" class="w-full text-xs p-2 border rounded" placeholder="للبنين / للبنات">
                 </div>
 
                 <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-3">
                     <h3 class="font-bold text-xs text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-align-center ml-1"></i> منتصف الترويسة (كليشة الامتحان)</h3>
-                    <input type="text" id="in-c1" value="أسئلة امتحان نهاية السنة" oninput="updateHeader()" class="w-full text-xs p-2 border rounded font-bold" placeholder="العنوان الرئيسي">
-                    <input type="text" id="in-c2" value="للعام الدراسي 2025-2026" oninput="updateHeader()" class="w-full text-xs p-2 border rounded" placeholder="العام الدراسي">
-                    <input type="text" id="in-c3" value="الدور الأول" oninput="updateHeader()" class="w-full text-xs p-2 border rounded" placeholder="الدور">
+                    <input type="text" id="in-c1" oninput="updateHeader()" class="w-full text-xs p-2 border rounded font-bold" placeholder="عنوان الامتحان (مثال: أسئلة امتحان نهاية السنة)">
+                    <input type="text" id="in-c2" oninput="updateHeader()" class="w-full text-xs p-2 border rounded" placeholder="العام الدراسي (مثال: للعام الدراسي 2025-2026)">
+                    <input type="text" id="in-c3" oninput="updateHeader()" class="w-full text-xs p-2 border rounded" placeholder="الدور (مثال: الدور الأول)">
                 </div>
 
                 <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-3">
                     <h3 class="font-bold text-xs text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-align-left ml-1"></i> الجانب الأيسر (تفاصيل المادة)</h3>
                     <div class="grid grid-cols-2 gap-2">
-                        <input type="text" id="in-subject" value="اللغة العربية" oninput="updateHeader()" class="text-xs p-2 border rounded" placeholder="المادة">
-                        <input type="text" id="in-class" value="الثاني المتوسط" oninput="updateHeader()" class="text-xs p-2 border rounded" placeholder="الصف">
-                        <input type="text" id="in-time" value="ساعة ونصف" oninput="updateHeader()" class="text-xs p-2 border rounded" placeholder="الوقت">
-                        <input type="text" id="in-date" value="2026/06/15" oninput="updateHeader()" class="text-xs p-2 border rounded" placeholder="التاريخ">
+                        <input type="text" id="in-subject" oninput="updateHeader()" class="text-xs p-2 border rounded" placeholder="اسم المادة">
+                        <input type="text" id="in-class" oninput="updateHeader()" class="text-xs p-2 border rounded" placeholder="الصف الدراسي">
+                        <input type="text" id="in-time" oninput="updateHeader()" class="text-xs p-2 border rounded" placeholder="الوقت المحدد">
+                        <input type="text" id="in-date" oninput="updateHeader()" class="text-xs p-2 border rounded" placeholder="التاريخ">
                     </div>
                 </div>
 
@@ -350,7 +354,11 @@
                 
                 <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-3">
                     <h3 class="font-bold text-xs text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-comment-medical ml-1"></i> الملاحظة العامة (أعلى الورقة)</h3>
-                    <input type="text" id="in-note" value="ملاحظة: الإجابة عن جميع الأسئلة (لكل سؤال 20 درجة)" oninput="updateFooter()" class="w-full text-xs p-2 border rounded font-bold">
+                    <div class="grid grid-cols-2 gap-2">
+                        <input type="text" id="in-note-qcount" oninput="updateFooter()" class="text-xs p-2 border rounded" placeholder="عدد الأسئلة للإجابة (مثال: أجب عن 5 أسئلة)">
+                        <input type="text" id="in-note-score" oninput="updateFooter()" class="text-xs p-2 border rounded" placeholder="الدرجة لكل سؤال (مثال: 20)">
+                    </div>
+                    <input type="text" id="in-note-custom" oninput="updateFooter()" class="w-full text-xs p-2 border rounded font-bold" placeholder="أو اكتب ملاحظة مخصصة هنا مباشرة...">
                 </div>
 
                 <!-- Multiple Teachers Control Section -->
@@ -369,7 +377,7 @@
 
                 <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-3">
                     <h3 class="font-bold text-xs text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-heart ml-1"></i> العبارة التشجيعية</h3>
-                    <input type="text" id="in-wish" value="تمنياتنا لكم بالنجاح والتوفيق" oninput="updateFooter()" class="w-full text-xs p-2 border rounded" placeholder="عبارة تشجيعية">
+                    <input type="text" id="in-wish" oninput="updateFooter()" class="w-full text-xs p-2 border rounded" placeholder="عبارة تشجيعية (مثال: تمنياتنا لكم بالنجاح والتوفيق)">
                 </div>
 
             </div>
@@ -380,8 +388,19 @@
 
     <!-- Application Script Logic -->
     <script>
-        // Global App State
-        let teachers = ["أ. أحمد علي", "أ. حسين كريم"];
+        // Grammar Helper Function for Arabic Degree Suffixes
+        function formatScoreArabic(scoreNum) {
+            const num = parseFloat(scoreNum);
+            if (isNaN(num)) return scoreNum || '';
+            
+            if (num === 1) return "درجة واحدة";
+            if (num === 2) return "درجتان";
+            if (num >= 3 && num <= 10) return `${num} درجات`;
+            return `${num} درجة`;
+        }
+
+        // Default Data & State Setup
+        let teachers = ["علي سالم"];
 
         let examData = {
             items: [
@@ -420,7 +439,7 @@
                         {
                             id: 'sub_2_2',
                             label: 'ب',
-                            text: 'اختر الجواب الصحيح من بين القوسين لما يلي:',
+                            text: 'اختر الإجابة الصحيحة من بين القوسين لما يلي:',
                             score: '10',
                             qType: 'mcq',
                             items: [
@@ -433,11 +452,18 @@
             ]
         };
 
+        // Automatic Text Definitions for Question Types
+        const QUESTION_TYPE_TEXTS = {
+            mcq: 'اختر الإجابة الصحيحة من بين القوسين لما يلي:',
+            tf: 'ضع كلمة (صح) أمام العبارة الصحيحة وكلمة (خطأ) أمام العبارة الخاطئة:'
+        };
+
         // Initialize App
         window.onload = function() {
             renderTeachersEditor();
             renderEditor();
             renderPreview();
+            updateFooter();
         };
 
         // Tab Switching Logic
@@ -454,31 +480,47 @@
             document.getElementById('btn-' + tabId).className = "flex-1 py-2 text-center border-b-2 border-amber-500 text-amber-600 font-bold";
         }
 
-        // Direct Text Input Updates
+        // Direct Text Input Updates with Fallback Placeholders
         function updateHeader() {
-            document.getElementById('pv-right-1').innerText = document.getElementById('in-r1').value;
-            document.getElementById('pv-right-2').innerText = document.getElementById('in-r2').value;
-            document.getElementById('pv-right-3').innerText = document.getElementById('in-r3').value;
+            document.getElementById('pv-right-1').innerText = document.getElementById('in-r1').value || document.getElementById('in-r1').placeholder;
+            document.getElementById('pv-right-2').innerText = document.getElementById('in-r2').value || document.getElementById('in-r2').placeholder;
+            document.getElementById('pv-right-3').innerText = document.getElementById('in-r3').value || document.getElementById('in-r3').placeholder;
 
-            document.getElementById('pv-center-1').innerText = document.getElementById('in-c1').value;
-            document.getElementById('pv-center-2').innerText = document.getElementById('in-c2').value;
-            document.getElementById('pv-center-3').innerText = document.getElementById('in-c3').value;
+            document.getElementById('pv-center-1').innerText = document.getElementById('in-c1').value || document.getElementById('in-c1').placeholder;
+            document.getElementById('pv-center-2').innerText = document.getElementById('in-c2').value || document.getElementById('in-c2').placeholder;
+            document.getElementById('pv-center-3').innerText = document.getElementById('in-c3').value || document.getElementById('in-c3').placeholder;
 
-            document.getElementById('pv-left-subject').innerText = document.getElementById('in-subject').value;
-            document.getElementById('pv-left-class').innerText = document.getElementById('in-class').value;
-            document.getElementById('pv-left-time').innerText = document.getElementById('in-time').value;
-            document.getElementById('pv-left-date').innerText = document.getElementById('in-date').value;
+            document.getElementById('pv-left-subject').innerText = document.getElementById('in-subject').value || "اللغة العربية";
+            document.getElementById('pv-left-class').innerText = document.getElementById('in-class').value || "الثاني المتوسط";
+            document.getElementById('pv-left-time').innerText = document.getElementById('in-time').value || "ساعة ونصف";
+            document.getElementById('pv-left-date').innerText = document.getElementById('in-date').value || "2026/06/15";
         }
 
         function updateFooter() {
-            document.getElementById('pv-note').innerText = document.getElementById('in-note').value;
-            document.getElementById('pv-wish').innerText = document.getElementById('in-wish').value;
+            const customNote = document.getElementById('in-note-custom').value;
+            const qCountNote = document.getElementById('in-note-qcount').value;
+            const scoreNote = document.getElementById('in-note-score').value;
+
+            if (customNote.trim() !== '') {
+                document.getElementById('pv-note').innerText = customNote;
+            } else {
+                let noteText = "ملاحظة: ";
+                noteText += qCountNote.trim() ? qCountNote : "الإجابة عن جميع الأسئلة";
+                if (scoreNote.trim()) {
+                    noteText += ` (لكل سؤال ${formatScoreArabic(scoreNote)})`;
+                } else {
+                    noteText += " (لكل سؤال 20 درجة)";
+                }
+                document.getElementById('pv-note').innerText = noteText;
+            }
+
+            document.getElementById('pv-wish').innerText = document.getElementById('in-wish').value || document.getElementById('in-wish').placeholder;
             renderTeachersPreview();
         }
 
         // Teachers Dynamic Functions
         function addTeacher() {
-            teachers.push("أ. اسم المدرس");
+            teachers.push("");
             renderTeachersEditor();
             renderTeachersPreview();
         }
@@ -501,7 +543,7 @@
                 div.className = "flex items-center gap-2";
                 div.innerHTML = `
                     <span class="text-xs font-bold text-slate-500 w-16">${idx + 1}. المدرس:</span>
-                    <input type="text" value="${tName}" oninput="teachers[${idx}] = this.value; renderTeachersPreview();" class="flex-1 text-xs p-2 border rounded">
+                    <input type="text" value="${tName}" placeholder="اسم المدرس" oninput="teachers[${idx}] = this.value; renderTeachersPreview();" class="flex-1 text-xs p-2 border rounded">
                     ${teachers.length > 1 ? `<button onclick="deleteTeacher(${idx})" class="text-red-500 hover:text-red-700 text-xs p-1"><i class="fa-solid fa-trash"></i></button>` : ''}
                 `;
                 container.appendChild(div);
@@ -512,8 +554,9 @@
             const labelEl = document.getElementById('pv-teacher-label');
             const listEl = document.getElementById('pv-teachers-list');
 
+            // Requirement 4: "مدرسو المادة" if > 1 teacher
             if (teachers.length > 1) {
-                labelEl.innerText = "مدرسا المادة:";
+                labelEl.innerText = "مدرسو المادة:";
             } else {
                 labelEl.innerText = "مدرس المادة:";
             }
@@ -522,7 +565,7 @@
             teachers.forEach((name) => {
                 const span = document.createElement('span');
                 span.className = "font-semibold";
-                span.innerText = name;
+                span.innerText = name || "اسم المدرس";
                 listEl.appendChild(span);
             });
         }
@@ -550,7 +593,7 @@
             examData.items.push({
                 id: 'sec_' + Date.now(),
                 type: 'section',
-                title: 'عنوان القسم الجديد (مثال: القواعد)'
+                title: ''
             });
             renderEditor();
             renderPreview();
@@ -562,7 +605,7 @@
                 id: 'q_' + Date.now(),
                 type: 'question',
                 num: 'س' + qCount,
-                text: 'اكتب نص السؤال هنا...',
+                text: '',
                 score: '20',
                 qType: 'essay',
                 items: [],
@@ -580,7 +623,7 @@
             currentSubs.push({
                 id: 'sub_' + Date.now(),
                 label: nextLabel,
-                text: 'اكتب الفرع الجديد هنا...',
+                text: '',
                 score: '10',
                 qType: 'essay',
                 items: []
@@ -590,13 +633,13 @@
         }
 
         function addQuestionItem(qIndex) {
-            examData.items[qIndex].items.push({ text: 'اكتب العبارة أو الاختيار هنا...' });
+            examData.items[qIndex].items.push({ text: '' });
             renderEditor();
             renderPreview();
         }
 
         function addSubItem(qIndex, subIndex) {
-            examData.items[qIndex].subs[subIndex].items.push({ text: 'اكتب العبارة أو الاختيار هنا...' });
+            examData.items[qIndex].subs[subIndex].items.push({ text: '' });
             renderEditor();
             renderPreview();
         }
@@ -622,6 +665,25 @@
 
         function deleteSubItem(qIndex, subIndex, itemIndex) {
             examData.items[qIndex].subs[subIndex].items.splice(itemIndex, 1);
+            renderEditor();
+            renderPreview();
+        }
+
+        // Handle Automatic Text Insertion on Type Change
+        function handleMainTypeChange(qIndex, newType) {
+            examData.items[qIndex].qType = newType;
+            if (QUESTION_TYPE_TEXTS[newType]) {
+                examData.items[qIndex].text = QUESTION_TYPE_TEXTS[newType];
+            }
+            renderEditor();
+            renderPreview();
+        }
+
+        function handleSubTypesChange(qIndex, subIndex, newType) {
+            examData.items[qIndex].subs[subIndex].qType = newType;
+            if (QUESTION_TYPE_TEXTS[newType]) {
+                examData.items[qIndex].subs[subIndex].text = QUESTION_TYPE_TEXTS[newType];
+            }
             renderEditor();
             renderPreview();
         }
@@ -654,7 +716,7 @@
                     secDiv.innerHTML = `
                         <div class="flex items-center gap-2 flex-1">
                             <i class="fa-solid fa-folder text-amber-600"></i>
-                            <input type="text" value="${item.title}" oninput="examData.items[${index}].title = this.value; renderPreview();" class="w-full text-xs p-1.5 border rounded font-bold" placeholder="عنوان القسم (مثال: القواعد)">
+                            <input type="text" value="${item.title}" oninput="examData.items[${index}].title = this.value; renderPreview();" class="w-full text-xs p-1.5 border rounded font-bold" placeholder="عنوان القسم (مثال: القواعد ، الجغرافيا)">
                         </div>
                         <button onclick="deleteItem(${index})" class="text-red-500 hover:text-red-700 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
                     `;
@@ -671,7 +733,7 @@
                             mainQuestionItemsHtml += `
                                 <div class="flex items-center gap-1">
                                     <span class="text-xs font-bold text-gray-500">${itemIdx + 1}.</span>
-                                    <input type="text" value="${qItem.text}" oninput="examData.items[${index}].items[${itemIdx}].text = this.value; renderPreview();" class="flex-1 text-xs p-1 border rounded" placeholder="نص الفقرة...">
+                                    <input type="text" value="${qItem.text}" oninput="examData.items[${index}].items[${itemIdx}].text = this.value; renderPreview();" class="flex-1 text-xs p-1 border rounded" placeholder="نص الفقرة هنا...">
                                     <button onclick="deleteQuestionItem(${index}, ${itemIdx})" class="text-red-400 text-xs"><i class="fa-solid fa-xmark"></i></button>
                                 </div>
                             `;
@@ -691,13 +753,13 @@
                                 itemsListHtml += `
                                     <div class="flex items-center gap-1">
                                         <span class="text-xs font-bold text-gray-500">${itemIdx + 1}.</span>
-                                        <input type="text" value="${subItem.text}" oninput="examData.items[${index}].subs[${subIdx}].items[${itemIdx}].text = this.value; renderPreview();" class="flex-1 text-xs p-1 border rounded" placeholder="نص الفقرة...">
+                                        <input type="text" value="${subItem.text}" oninput="examData.items[${index}].subs[${subIdx}].items[${itemIdx}].text = this.value; renderPreview();" class="flex-1 text-xs p-1 border rounded" placeholder="نص الفقرة الفرعية هنا...">
                                         <button onclick="deleteSubItem(${index}, ${subIdx}, ${itemIdx})" class="text-red-400 text-xs"><i class="fa-solid fa-xmark"></i></button>
                                     </div>
                                 `;
                             });
                             itemsListHtml += `
-                                <button onclick="addSubItem(${index}, ${subIdx})" class="text-xs text-blue-600 hover:underline mt-1">+ إضافة فقرة فرعية (${sub.qType === 'mcq' ? 'اختيار' : 'صح/خطأ'})</button>
+                                <button onclick="addSubItem(${index}, ${subIdx})" class="text-xs text-blue-600 hover:underline mt-1">+ إضافة فقرة (${sub.qType === 'mcq' ? 'اختيار' : 'صح/خطأ'})</button>
                             </div>`;
                         }
 
@@ -705,13 +767,13 @@
                             <div class="bg-white p-2.5 rounded border border-gray-200 space-y-2">
                                 <div class="flex items-center gap-2">
                                     <input type="text" value="${sub.label}" oninput="examData.items[${index}].subs[${subIdx}].label = this.value; renderPreview();" class="w-12 text-xs p-1 border rounded text-center font-bold" placeholder="أ">
-                                    <input type="text" value="${sub.text}" oninput="examData.items[${index}].subs[${subIdx}].text = this.value; renderPreview();" class="flex-1 text-xs p-1 border rounded" placeholder="نص الفرع...">
+                                    <input type="text" value="${sub.text}" oninput="examData.items[${index}].subs[${subIdx}].text = this.value; renderPreview();" class="flex-1 text-xs p-1 border rounded" placeholder="نص الفرع هنا...">
                                     <input type="text" value="${sub.score}" oninput="examData.items[${index}].subs[${subIdx}].score = this.value; calculateQuestionScore(${index});" class="w-14 text-xs p-1 border rounded text-center" placeholder="درجة">
                                     <button onclick="deleteSubQuestion(${index}, ${subIdx})" class="text-red-500 text-xs"><i class="fa-solid fa-trash"></i></button>
                                 </div>
                                 <div class="flex items-center gap-2">
                                     <label class="text-[11px] text-gray-500">نوع الأسئلة الفرعية:</label>
-                                    <select onchange="examData.items[${index}].subs[${subIdx}].qType = this.value; renderEditor(); renderPreview();" class="text-xs p-1 border rounded bg-gray-50">
+                                    <select onchange="handleSubTypesChange(${index}, ${subIdx}, this.value)" class="text-xs p-1 border rounded bg-gray-50">
                                         <option value="essay" ${sub.qType === 'essay' ? 'selected' : ''}>نص طويل / مقالي</option>
                                         <option value="mcq" ${sub.qType === 'mcq' ? 'selected' : ''}>اختيارات من متعدد</option>
                                         <option value="tf" ${sub.qType === 'tf' ? 'selected' : ''}>صح وخطأ</option>
@@ -726,10 +788,10 @@
                     if (item.subs.length === 0) {
                         mainQuestionControls = `
                             <div class="space-y-2 bg-white p-2 rounded border border-gray-200">
-                                <input type="text" value="${item.text}" oninput="examData.items[${index}].text = this.value; renderPreview();" class="w-full text-xs p-1.5 border rounded" placeholder="نص السؤال المباشر هنا...">
+                                <input type="text" value="${item.text}" oninput="examData.items[${index}].text = this.value; renderPreview();" class="w-full text-xs p-1.5 border rounded" placeholder="اكتب نص السؤال هنا...">
                                 <div class="flex items-center gap-2">
                                     <label class="text-[11px] text-gray-500">نوع السؤال:</label>
-                                    <select onchange="examData.items[${index}].qType = this.value; renderEditor(); renderPreview();" class="text-xs p-1 border rounded bg-gray-50">
+                                    <select onchange="handleMainTypeChange(${index}, this.value)" class="text-xs p-1 border rounded bg-gray-50">
                                         <option value="essay" ${item.qType === 'essay' ? 'selected' : ''}>نص طويل / مقالي</option>
                                         <option value="mcq" ${item.qType === 'mcq' ? 'selected' : ''}>اختيارات من متعدد</option>
                                         <option value="tf" ${item.qType === 'tf' ? 'selected' : ''}>صح وخطأ</option>
@@ -748,7 +810,7 @@
                             </div>
                             <div class="flex items-center gap-1">
                                 <span class="text-xs font-bold">الدرجة:</span>
-                                <input type="text" id="q-score-input-${index}" value="${item.score}" oninput="examData.items[${index}].score = this.value; renderPreview();" class="w-12 text-xs p-1 border rounded text-center font-bold bg-amber-50">
+                                <input type="text" id="q-score-input-${index}" value="${item.score}" oninput="examData.items[${index}].score = this.value; renderPreview();" class="w-12 text-xs p-1 border rounded text-center font-bold bg-amber-50" placeholder="20">
                                 <button onclick="deleteItem(${index})" class="text-red-500 hover:text-red-700 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </div>
@@ -775,16 +837,17 @@
             examData.items.forEach((item) => {
                 if (item.type === 'section') {
                     const secBlock = document.createElement('div');
-                    secBlock.className = "text-center my-2";
+                    secBlock.className = "text-center my-1.5";
                     secBlock.innerHTML = `
-                        <span class="font-bold px-4 py-0.5 inline-block ${secLineClass}">[ ${item.title} ]</span>
+                        <span class="font-bold px-4 py-0.5 inline-block ${secLineClass}">[ ${item.title || 'عنوان القسم'} ]</span>
                     `;
                     container.appendChild(secBlock);
                 } else if (item.type === 'question') {
                     const qBlock = document.createElement('div');
-                    qBlock.className = `pb-2 ${sepClass}`;
+                    qBlock.className = `pb-1.5 ${sepClass}`;
 
-                    let scoreStr = item.score ? `(${item.score} درجة)` : '';
+                    let scoreFormatted = item.score ? formatScoreArabic(item.score) : '';
+                    let scoreStr = scoreFormatted ? `(${scoreFormatted})` : '';
 
                     let contentHtml = '';
 
@@ -792,16 +855,16 @@
                     if (item.subs.length === 0) {
                         let mainItemsRender = '';
                         if ((item.qType === 'mcq' || item.qType === 'tf') && item.items.length > 0) {
-                            mainItemsRender = '<ol class="list-decimal list-inside pr-4 space-y-1 my-1">';
+                            mainItemsRender = '<ol class="list-decimal list-inside pr-4 space-y-0.5 my-1">';
                             item.items.forEach(it => {
-                                mainItemsRender += `<li>${it.text}</li>`;
+                                mainItemsRender += `<li>${it.text || '................................'}</li>`;
                             });
                             mainItemsRender += '</ol>';
                         }
 
                         contentHtml = `
                             <div class="flex justify-between items-start">
-                                <div class="flex-1"><span class="font-bold">${item.num}:</span> ${item.text}</div>
+                                <div class="flex-1"><span class="font-bold">${item.num}:</span> ${item.text || 'نص السؤال المباشر...'}</div>
                                 <span class="font-bold text-xs whitespace-nowrap mr-2">${scoreStr}</span>
                             </div>
                             ${mainItemsRender}
@@ -810,13 +873,14 @@
                         // Question with sub-questions
                         let subsHtml = '';
                         item.subs.forEach(sub => {
-                            let subScore = sub.score ? `(${sub.score} د)` : '';
+                            let subScoreFormatted = sub.score ? formatScoreArabic(sub.score) : '';
+                            let subScore = subScoreFormatted ? `(${subScoreFormatted})` : '';
 
                             let itemsRender = '';
                             if ((sub.qType === 'mcq' || sub.qType === 'tf') && sub.items.length > 0) {
-                                itemsRender = '<ol class="list-decimal list-inside pr-4 space-y-1 my-1">';
+                                itemsRender = '<ol class="list-decimal list-inside pr-4 space-y-0.5 my-1">';
                                 sub.items.forEach(it => {
-                                    itemsRender += `<li>${it.text}</li>`;
+                                    itemsRender += `<li>${it.text || '................................'}</li>`;
                                 });
                                 itemsRender += '</ol>';
                             }
@@ -825,7 +889,7 @@
                                 <div class="mt-1">
                                     <div class="flex justify-between items-start">
                                         <div class="flex-1">
-                                            <span class="font-bold">${sub.label})</span> ${sub.text}
+                                            <span class="font-bold">${sub.label})</span> ${sub.text || 'نص الفرع...'}
                                         </div>
                                         <span class="text-xs font-bold mr-2 whitespace-nowrap">${subScore}</span>
                                     </div>
@@ -836,10 +900,10 @@
 
                         contentHtml = `
                             <div class="flex justify-between items-start">
-                                <div class="flex-1"><span class="font-bold">${item.num}:</span> ${item.text}</div>
+                                <div class="flex-1"><span class="font-bold">${item.num}:</span> ${item.text || 'أجب عن الأسئلة التالية:'}</div>
                                 <span class="font-bold text-xs whitespace-nowrap mr-2">${scoreStr}</span>
                             </div>
-                            <div class="space-y-1 mt-1">
+                            <div class="space-y-1 mt-0.5">
                                 ${subsHtml}
                             </div>
                         `;
