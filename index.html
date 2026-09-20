@@ -73,6 +73,7 @@
         }
 
         /* Separator Line Styles */
+        .sep-none { border-bottom: none; }
         .sep-solid { border-bottom: 1.5px solid #000; }
         .sep-dashed { border-bottom: 1.5px dashed #000; }
         .sep-dotted { border-bottom: 2px dotted #000; }
@@ -105,7 +106,7 @@
             <i class="fa-solid fa-file-pen text-amber-400 text-2xl"></i>
             <div>
                 <h1 class="font-bold text-lg leading-tight">منشئ الأسئلة الامتحانية الاحترافي</h1>
-                <p class="text-xs text-slate-400">صمم واطبع أسئلتك بسهولة وتنسيق عالي الدقة</p>
+                <p class="text-xs text-slate-400">صمم واطبع أسئلتك بسهولة وتنسيق عالي الدقة ( تصميم الاستاذ علي سالم هادي - متوسطة عقيل بن ابي طالب للبنين )</p>
             </div>
         </div>
         <div class="flex items-center gap-2">
@@ -131,7 +132,7 @@
                     <div class="grid grid-cols-3 items-center text-center border-b pb-3 mb-3 border-black">
                         <!-- Right Column -->
                         <div class="text-right space-y-1">
-                            <div id="pv-right-1" class="font-bold">إدارة المدرسة</div>
+                            <div id="pv-right-1" class="font-bold">إدارة</div>
                             <div id="pv-right-2">اسم المدرسة هنا</div>
                             <div id="pv-right-3" class="text-xs">للبنين / للبنات</div>
                         </div>
@@ -168,12 +169,9 @@
 
                 <!-- Footer Section (التذييل) -->
                 <div class="mt-8 pt-4 border-t border-black">
-                    <div class="flex justify-between items-end mb-2">
-                        <div id="pv-teacher-name" class="font-bold">مدرس المادة: أ. أحمد علي</div>
+                    <div class="flex justify-between items-end">
+                        <div id="pv-teacher-name" class="font-bold">مدرس المادة: أ. أحمد علي / أ. حسين كريم</div>
                         <div id="pv-wish" class="font-bold italic">تمنياتنا لكم بالنجاح والتوفيق</div>
-                    </div>
-                    <div id="pv-rights" class="text-center text-xs border-t border-dashed border-gray-400 pt-1 text-gray-600">
-                        تصميم وإعداد: الأستاذ علي سالم
                     </div>
                 </div>
 
@@ -231,14 +229,26 @@
                             </select>
                         </div>
                         <div>
-                            <label class="block text-xs font-semibold mb-1">خط الفواصل</label>
+                            <label class="block text-xs font-semibold mb-1">الخط الفاصل بين الأسئلة</label>
                             <select id="cfg-sep-style" onchange="updateDesign()" class="w-full text-xs p-2 border rounded">
                                 <option value="sep-solid">خط صلب مستقيم</option>
                                 <option value="sep-dashed">خط متقطع (Dashed)</option>
                                 <option value="sep-dotted">خط منقط (Dotted)</option>
                                 <option value="sep-double">خط مزدوج (Double)</option>
+                                <option value="sep-none">بدون خط فاصل</option>
                             </select>
                         </div>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold mb-1">الخط أسفل العناوين الرئيسية للأقسام</label>
+                        <select id="cfg-sec-line-style" onchange="renderPreview()" class="w-full text-xs p-2 border rounded">
+                            <option value="border-b-2 border-black">خط صلب مستقيم</option>
+                            <option value="border-b-2 border-dashed border-black">خط متقطع (Dashed)</option>
+                            <option value="border-b-2 border-dotted border-black">خط منقط (Dotted)</option>
+                            <option value="border-b-4 border-double border-black">خط مزدوج (Double)</option>
+                            <option value="border-none">بدون خط تحت العنوان</option>
+                        </select>
                     </div>
                 </div>
 
@@ -275,7 +285,7 @@
                     <h3 class="font-bold text-sm">هيكلية الأسئلة والأقسام</h3>
                     <div class="flex gap-1">
                         <button onclick="addMainSection()" class="bg-emerald-600 hover:bg-emerald-700 text-white text-xs px-2 py-1.5 rounded flex items-center gap-1">
-                            <i class="fa-solid fa-folder-plus"></i> إضافة قسم (مثال: القواعد)
+                            <i class="fa-solid fa-folder-plus"></i> إضافة عنوان قسم (مثال: القواعد)
                         </button>
                         <button onclick="addQuestion()" class="bg-blue-600 hover:bg-blue-700 text-white text-xs px-2 py-1.5 rounded flex items-center gap-1">
                             <i class="fa-solid fa-circle-plus"></i> إضافة سؤال
@@ -298,9 +308,8 @@
 
                 <div class="bg-slate-50 p-3 rounded-lg border border-slate-200 space-y-3">
                     <h3 class="font-bold text-xs text-slate-500 uppercase tracking-wider"><i class="fa-solid fa-user-pen ml-1"></i> أسماء المدرسين والعبارة التشجيعية</h3>
-                    <input type="text" id="in-teacher" value="مدرس المادة: أ. أحمد علي" oninput="updateFooter()" class="w-full text-xs p-2 border rounded" placeholder="اسم المدرس">
+                    <input type="text" id="in-teacher" value="مدرس المادة: أ. أحمد علي / أ. حسين كريم" oninput="updateFooter()" class="w-full text-xs p-2 border rounded" placeholder="اسم المدرس (يمكن إضافة أكثر من مدرس يفصل بينهما علامة /)">
                     <input type="text" id="in-wish" value="تمنياتنا لكم بالنجاح والتوفيق" oninput="updateFooter()" class="w-full text-xs p-2 border rounded" placeholder="عبارة تشجيعية">
-                    <input type="text" id="in-rights" value="تصميم وإعداد: الأستاذ علي سالم" oninput="updateFooter()" class="w-full text-xs p-2 border rounded" placeholder="حقوق التصميم/المدرسة">
                 </div>
 
             </div>
@@ -323,19 +332,31 @@
                     id: 'q_1',
                     type: 'question',
                     num: 'س1',
-                    title: 'القواعد',
+                    text: 'اشرح عن البنكرياس بالتفصيل مع الرسم واذكر أهم وظائفه.',
                     score: '20',
+                    qType: 'essay',
+                    items: [],
+                    subs: []
+                },
+                {
+                    id: 'q_2',
+                    type: 'question',
+                    num: 'س2',
+                    text: '',
+                    score: '20',
+                    qType: 'essay',
+                    items: [],
                     subs: [
                         {
-                            id: 'sub_1_1',
+                            id: 'sub_2_1',
                             label: 'أ',
-                            text: 'اكتب نص الفرع الأول أو السؤال المباشر هنا...',
+                            text: 'عرف ما يلي لثلاث فقط:',
                             score: '10',
                             qType: 'essay',
                             items: []
                         },
                         {
-                            id: 'sub_1_2',
+                            id: 'sub_2_2',
                             label: 'ب',
                             text: 'اختر الجواب الصحيح من بين القوسين لما يلي:',
                             score: '10',
@@ -343,26 +364,6 @@
                             items: [
                                 { text: 'الماء في الحالة الطبيعية يعتبر مركب ___ (سائل ، صلب ، غاز)' },
                                 { text: 'يتكون الهواء بشكل أساسي من غاز ___ (الأوكسجين ، النيتروجين)' }
-                            ]
-                        }
-                    ]
-                },
-                {
-                    id: 'q_2',
-                    type: 'question',
-                    num: 'س2',
-                    title: 'الإملاء والنصوص',
-                    score: '15',
-                    subs: [
-                        {
-                            id: 'sub_2_1',
-                            label: 'أ',
-                            text: 'ضع كلمة (صح) أمام العبارة الصحيحة وكلمة (خطأ) أمام الخاطئة:',
-                            score: '15',
-                            qType: 'tf',
-                            items: [
-                                { text: 'يتجمد الماء عند درجة حرارة صفر مئوية.' },
-                                { text: 'تعتبر الشمس المصدر الرئيسي للضوء والحرارة.' }
                             ]
                         }
                     ]
@@ -410,7 +411,6 @@
             document.getElementById('pv-note').innerText = document.getElementById('in-note').value;
             document.getElementById('pv-teacher-name').innerText = document.getElementById('in-teacher').value;
             document.getElementById('pv-wish').innerText = document.getElementById('in-wish').value;
-            document.getElementById('pv-rights').innerText = document.getElementById('in-rights').value;
         }
 
         function updateDesign() {
@@ -448,18 +448,11 @@
                 id: 'q_' + Date.now(),
                 type: 'question',
                 num: 'س' + qCount,
-                title: '',
+                text: 'اكتب نص السؤال هنا...',
                 score: '20',
-                subs: [
-                    {
-                        id: 'sub_' + Date.now(),
-                        label: 'أ',
-                        text: 'اكتب نص السؤال الفرعي هنا...',
-                        score: '10',
-                        qType: 'essay',
-                        items: []
-                    }
-                ]
+                qType: 'essay',
+                items: [],
+                subs: []
             });
             renderEditor();
             renderPreview();
@@ -482,10 +475,14 @@
             renderPreview();
         }
 
+        function addQuestionItem(qIndex) {
+            examData.items[qIndex].items.push({ text: 'اكتب العبارة أو الاختيار هنا...' });
+            renderEditor();
+            renderPreview();
+        }
+
         function addSubItem(qIndex, subIndex) {
-            examData.items[qIndex].subs[subIndex].items.push({
-                text: 'اكتب العبارة أو الاختيار هنا...'
-            });
+            examData.items[qIndex].subs[subIndex].items.push({ text: 'اكتب العبارة أو الاختيار هنا...' });
             renderEditor();
             renderPreview();
         }
@@ -498,6 +495,13 @@
 
         function deleteSubQuestion(qIndex, subIndex) {
             examData.items[qIndex].subs.splice(subIndex, 1);
+            calculateQuestionScore(qIndex);
+            renderEditor();
+            renderPreview();
+        }
+
+        function deleteQuestionItem(qIndex, itemIndex) {
+            examData.items[qIndex].items.splice(itemIndex, 1);
             renderEditor();
             renderPreview();
         }
@@ -511,12 +515,15 @@
         // Calculate Question Total Score
         function calculateQuestionScore(qIndex) {
             const question = examData.items[qIndex];
-            let total = 0;
-            question.subs.forEach(s => {
-                total += parseFloat(s.score) || 0;
-            });
-            question.score = total;
-            document.getElementById(`q-score-input-${qIndex}`).value = total;
+            if (question.subs && question.subs.length > 0) {
+                let total = 0;
+                question.subs.forEach(s => {
+                    total += parseFloat(s.score) || 0;
+                });
+                question.score = total;
+                const scoreInput = document.getElementById(`q-score-input-${qIndex}`);
+                if (scoreInput) scoreInput.value = total;
+            }
             renderPreview();
         }
 
@@ -543,6 +550,23 @@
                     const qDiv = document.createElement('div');
                     qDiv.className = "bg-slate-50 p-3 rounded-lg border border-slate-300 space-y-3";
                     
+                    let mainQuestionItemsHtml = '';
+                    if ((item.qType === 'mcq' || item.qType === 'tf') && item.subs.length === 0) {
+                        mainQuestionItemsHtml = `<div class="mt-2 space-y-1 pr-4 border-r-2 border-slate-300">`;
+                        item.items.forEach((qItem, itemIdx) => {
+                            mainQuestionItemsHtml += `
+                                <div class="flex items-center gap-1">
+                                    <span class="text-xs font-bold text-gray-500">${itemIdx + 1}.</span>
+                                    <input type="text" value="${qItem.text}" oninput="examData.items[${index}].items[${itemIdx}].text = this.value; renderPreview();" class="flex-1 text-xs p-1 border rounded" placeholder="نص الفقرة...">
+                                    <button onclick="deleteQuestionItem(${index}, ${itemIdx})" class="text-red-400 text-xs"><i class="fa-solid fa-xmark"></i></button>
+                                </div>
+                            `;
+                        });
+                        mainQuestionItemsHtml += `
+                            <button onclick="addQuestionItem(${index})" class="text-xs text-blue-600 hover:underline mt-1">+ إضافة فقرة (${item.qType === 'mcq' ? 'اختيار' : 'صح/خطأ'})</button>
+                        </div>`;
+                    }
+
                     let subsHtml = '';
                     item.subs.forEach((sub, subIdx) => {
 
@@ -584,11 +608,29 @@
                         `;
                     });
 
+                    let mainQuestionControls = '';
+                    if (item.subs.length === 0) {
+                        mainQuestionControls = `
+                            <div class="space-y-2 bg-white p-2 rounded border border-gray-200">
+                                <input type="text" value="${item.text}" oninput="examData.items[${index}].text = this.value; renderPreview();" class="w-full text-xs p-1.5 border rounded" placeholder="نص السؤال المباشر هنا...">
+                                <div class="flex items-center gap-2">
+                                    <label class="text-[11px] text-gray-500">نوع السؤال:</label>
+                                    <select onchange="examData.items[${index}].qType = this.value; renderEditor(); renderPreview();" class="text-xs p-1 border rounded bg-gray-50">
+                                        <option value="essay" ${item.qType === 'essay' ? 'selected' : ''}>نص طويل / مقالي</option>
+                                        <option value="mcq" ${item.qType === 'mcq' ? 'selected' : ''}>اختيارات من متعدد</option>
+                                        <option value="tf" ${item.qType === 'tf' ? 'selected' : ''}>صح وخطأ</option>
+                                    </select>
+                                </div>
+                                ${mainQuestionItemsHtml}
+                            </div>
+                        `;
+                    }
+
                     qDiv.innerHTML = `
                         <div class="flex items-center justify-between border-b pb-2 gap-2">
                             <div class="flex items-center gap-2 flex-1">
-                                <input type="text" value="${item.num}" oninput="examData.items[${index}].num = this.value; renderPreview();" class="w-14 text-xs p-1 border rounded font-bold text-center" placeholder="س1">
-                                <input type="text" value="${item.title}" oninput="examData.items[${index}].title = this.value; renderPreview();" class="flex-1 text-xs p-1 border rounded" placeholder="عنوان اختياري للسؤال (مثال: القواعد)">
+                                <input type="text" value="${item.num}" oninput="examData.items[${index}].num = this.value; renderPreview();" class="w-16 text-xs p-1 border rounded font-bold text-center" placeholder="س1">
+                                <span class="text-xs text-gray-500 font-semibold">${item.subs.length > 0 ? '(سؤال يتضمن أفرع)' : '(سؤال مباشر)'}</span>
                             </div>
                             <div class="flex items-center gap-1">
                                 <span class="text-xs font-bold">الدرجة:</span>
@@ -596,11 +638,12 @@
                                 <button onclick="deleteItem(${index})" class="text-red-500 hover:text-red-700 text-xs p-1"><i class="fa-solid fa-trash"></i></button>
                             </div>
                         </div>
+                        ${mainQuestionControls}
                         <div class="space-y-2">
                             ${subsHtml}
                         </div>
                         <button onclick="addSubQuestion(${index})" class="w-full py-1 text-xs bg-slate-200 hover:bg-slate-300 text-slate-700 rounded text-center font-semibold">
-                            + إضافة فرع جديد (أ ، ب ، جـ)
+                            + إضافة فرع للسؤال (أ ، ب ، جـ)
                         </button>
                     `;
                     container.appendChild(qDiv);
@@ -612,6 +655,7 @@
         function renderPreview() {
             const container = document.getElementById('pv-questions-container');
             const sepClass = document.getElementById('cfg-sep-style').value;
+            const secLineClass = document.getElementById('cfg-sec-line-style').value;
             container.innerHTML = '';
 
             examData.items.forEach((item) => {
@@ -619,50 +663,76 @@
                     const secBlock = document.createElement('div');
                     secBlock.className = "text-center my-3";
                     secBlock.innerHTML = `
-                        <span class="font-bold border-b-2 border-t-2 border-black px-4 py-0.5 inline-block">[ ${item.title} ]</span>
+                        <span class="font-bold px-4 py-0.5 inline-block ${secLineClass}">[ ${item.title} ]</span>
                     `;
                     container.appendChild(secBlock);
                 } else if (item.type === 'question') {
                     const qBlock = document.createElement('div');
                     qBlock.className = `pb-3 ${sepClass}`;
 
-                    let titleStr = item.num + (item.title ? ` : ( ${item.title} )` : '');
                     let scoreStr = item.score ? `(${item.score} درجة)` : '';
 
-                    let subsHtml = '';
-                    item.subs.forEach(sub => {
-                        let subScore = sub.score ? `(${sub.score} د)` : '';
+                    let contentHtml = '';
 
-                        let itemsRender = '';
-                        if ((sub.qType === 'mcq' || sub.qType === 'tf') && sub.items.length > 0) {
-                            itemsRender = '<ol class="list-decimal list-inside pr-4 space-y-1 my-1">';
-                            sub.items.forEach(it => {
-                                itemsRender += `<li>${it.text}</li>`;
+                    // Direct question without sub-questions
+                    if (item.subs.length === 0) {
+                        let mainItemsRender = '';
+                        if ((item.qType === 'mcq' || item.qType === 'tf') && item.items.length > 0) {
+                            mainItemsRender = '<ol class="list-decimal list-inside pr-4 space-y-1 my-1">';
+                            item.items.forEach(it => {
+                                mainItemsRender += `<li>${it.text}</li>`;
                             });
-                            itemsRender += '</ol>';
+                            mainItemsRender += '</ol>';
                         }
 
-                        subsHtml += `
+                        contentHtml = `
                             <div class="mt-1">
-                                <div class="flex justify-between items-start">
-                                    <div class="flex-1">
-                                        <span class="font-bold">${sub.label})</span> ${sub.text}
-                                    </div>
-                                    <span class="text-xs font-bold mr-2 whitespace-nowrap">${subScore}</span>
-                                </div>
-                                ${itemsRender}
+                                <div><span class="font-bold">${item.num}:</span> ${item.text}</div>
+                                ${mainItemsRender}
                             </div>
                         `;
-                    });
+                    } else {
+                        // Question with sub-questions
+                        let subsHtml = '';
+                        item.subs.forEach(sub => {
+                            let subScore = sub.score ? `(${sub.score} د)` : '';
+
+                            let itemsRender = '';
+                            if ((sub.qType === 'mcq' || sub.qType === 'tf') && sub.items.length > 0) {
+                                itemsRender = '<ol class="list-decimal list-inside pr-4 space-y-1 my-1">';
+                                sub.items.forEach(it => {
+                                    itemsRender += `<li>${it.text}</li>`;
+                                });
+                                itemsRender += '</ol>';
+                            }
+
+                            subsHtml += `
+                                <div class="mt-1">
+                                    <div class="flex justify-between items-start">
+                                        <div class="flex-1">
+                                            <span class="font-bold">${sub.label})</span> ${sub.text}
+                                        </div>
+                                        <span class="text-xs font-bold mr-2 whitespace-nowrap">${subScore}</span>
+                                    </div>
+                                    ${itemsRender}
+                                </div>
+                            `;
+                        });
+
+                        contentHtml = `
+                            <div><span class="font-bold">${item.num}:</span> ${item.text}</div>
+                            <div class="space-y-1 mt-1">
+                                ${subsHtml}
+                            </div>
+                        `;
+                    }
 
                     qBlock.innerHTML = `
                         <div class="flex justify-between items-center font-bold mb-1">
-                            <span>${titleStr}</span>
+                            <span>${item.num}</span>
                             <span>${scoreStr}</span>
                         </div>
-                        <div class="space-y-1">
-                            ${subsHtml}
-                        </div>
+                        ${contentHtml}
                     `;
                     container.appendChild(qBlock);
                 }
