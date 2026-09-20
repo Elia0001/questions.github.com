@@ -32,18 +32,20 @@
         .preview-pane {
             flex: 1;
             background-color: #64748b;
-            padding: 1.5rem;
+            padding: 2rem 1.5rem;
             overflow-y: auto;
             display: flex;
             flex-direction: column;
             align-items: center;
             gap: 2rem;
+            height: 100%;
         }
 
-        /* Strict A4 Page Dimensions (Adjusted for print fit) */
+        /* Strict A4 Page Dimensions */
         .a4-page {
             width: 210mm;
             height: 285mm;
+            min-height: 285mm;
             max-height: 285mm;
             padding: 7mm 10mm;
             margin: 0 auto;
@@ -56,7 +58,7 @@
             flex-direction: column;
             justify-content: space-between;
             overflow: hidden;
-            page-break-after: always;
+            flex-shrink: 0;
         }
 
         /* English/LTR Mode Utilities */
@@ -91,16 +93,19 @@
                 overflow: visible;
             }
             .preview-pane {
-                padding: 0.5rem;
+                padding: 1rem 0.5rem;
+                height: auto;
+                overflow-y: visible;
             }
             .a4-page {
                 width: 100%;
                 height: auto;
+                min-height: 0;
                 max-height: none;
             }
         }
 
-        /* Print Media Styles */
+        /* Print Media Styles - Strict Page Handling */
         @media print {
             @page {
                 size: 210mm 285mm;
@@ -148,6 +153,11 @@
                 flex-direction: column !important;
                 justify-content: space-between !important;
                 overflow: hidden !important;
+            }
+
+            /* Hide Page 2 completely on print if 1 page selected */
+            .a4-page.print-hidden {
+                display: none !important;
             }
 
             .a4-page:last-child {
@@ -223,9 +233,9 @@
                 <!-- Footer Section Page 1 -->
                 <div class="mt-2 pt-1.5 border-t border-black">
                     <!-- Turn over label -->
-                    <div id="pv-turn-over" class="text-center text-xs font-bold my-1 hidden">اقلب الورقة ⤶</div>
+                    <div id="pv-turn-over" class="text-center text-sm font-bold my-1 hidden">اقلب الورقة ⤶</div>
                     
-                    <div class="flex justify-between items-end">
+                    <div id="pv-p1-footer-content" class="flex justify-between items-end">
                         <div class="font-bold flex items-center gap-2">
                             <span id="pv-teacher-label">مدرس المادة:</span>
                             <div id="pv-teachers-list" class="flex items-center gap-4"></div>
@@ -236,16 +246,10 @@
             </div>
 
             <!-- A4 Exam Sheet Preview - PAGE 2 (Optional) -->
-            <div id="exam-sheet-p2" class="a4-page font-amiri border-double-custom fs-medium hidden">
+            <div id="exam-sheet-p2" class="a4-page font-amiri border-double-custom fs-medium hidden print-hidden">
                 <div>
-                    <!-- Simplified Header Page 2 -->
-                    <div class="flex justify-between items-center border-b pb-1.5 mb-2 border-black font-bold text-sm">
-                        <div id="pv-p2-title">تابع أسئلة المادة</div>
-                        <div id="pv-p2-page-num">(الصفحة الثانية)</div>
-                    </div>
-
-                    <!-- Page 2 Questions Container -->
-                    <div id="pv-questions-container-p2" class="space-y-2.5"></div>
+                    <!-- Page 2 Questions Container (Isolated with max space) -->
+                    <div id="pv-questions-container-p2" class="space-y-2.5 pt-2"></div>
                 </div>
 
                 <!-- Footer Section Page 2 -->
@@ -548,8 +552,6 @@
                 document.getElementById('lbl-time').innerText = "Time:";
                 document.getElementById('lbl-date').innerText = "Date:";
                 document.getElementById('pv-turn-over').innerText = "Overleaf ⤶";
-                document.getElementById('pv-p2-title').innerText = "Questions Continued";
-                document.getElementById('pv-p2-page-num').innerText = "(Page 2)";
             } else {
                 sheet1.setAttribute('dir', 'rtl');
                 sheet2.setAttribute('dir', 'rtl');
@@ -560,11 +562,9 @@
                 document.getElementById('lbl-time').innerText = "الوقت:";
                 document.getElementById('lbl-date').innerText = "التاريخ:";
                 document.getElementById('pv-turn-over').innerText = "اقلب الورقة ⤶";
-                document.getElementById('pv-p2-title').innerText = "تابع أسئلة المادة";
-                document.getElementById('pv-p2-page-num').innerText = "(الصفحة الثانية)";
             }
 
-            // Auto Convert Question Numbers (Q1, Q2 vs س1، س2)
+            // Convert Question Numbers (Q1 vs س1)
             ['page1', 'page2'].forEach(pKey => {
                 let qCounter = 1;
                 examData[pKey].forEach(item => {
@@ -572,7 +572,6 @@
                         item.num = isEn ? `Q${qCounter}` : `س${qCounter}`;
                         qCounter++;
 
-                        // Convert Sub Labels
                         if (item.subs.length > 0) {
                             const labelsEn = ['A', 'B', 'C', 'D', 'E'];
                             const labelsAr = ['أ', 'ب', 'جـ', 'د', 'هـ'];
@@ -596,20 +595,28 @@
             const p2Sheet = document.getElementById('exam-sheet-p2');
             const p2Editor = document.getElementById('p2-editor-container');
             const turnOverLabel = document.getElementById('pv-turn-over');
+            const p1FooterContent = document.getElementById('pv-p1-footer-content');
 
             if (pagesCount === 2) {
                 p2Sheet.classList.remove('hidden');
+                p2Sheet.classList.remove('print-hidden');
                 p2Editor.classList.remove('hidden');
                 turnOverLabel.classList.remove('hidden');
+                
+                // Requirement 1: Hide teacher name & wish from page 1 when 2 pages chosen
+                p1FooterContent.classList.add('hidden');
 
-                // Initialize Page 2 default question if empty
                 if (examData.page2.length === 0) {
                     addQuestion(2);
                 }
             } else {
                 p2Sheet.classList.add('hidden');
+                p2Sheet.classList.add('print-hidden');
                 p2Editor.classList.add('hidden');
                 turnOverLabel.classList.add('hidden');
+
+                // Restore teacher name & wish to page 1 when single page
+                p1FooterContent.classList.remove('hidden');
             }
             renderPreview();
         }
@@ -718,7 +725,7 @@
             renderPreview();
         }
 
-        // Section & Question Operations per page
+        // Section & Question Operations
         function addMainSection(page) {
             const targetList = page === 1 ? examData.page1 : examData.page2;
             targetList.push({
@@ -931,7 +938,6 @@
                         `;
                     });
 
-                    // FIX: Always allow Main Question Text Header editing even when sub questions exist!
                     qDiv.innerHTML = `
                         <div class="flex items-center justify-between border-b pb-2 gap-2">
                             <div class="flex items-center gap-2 flex-1">
@@ -945,9 +951,8 @@
                             </div>
                         </div>
 
-                        <!-- Main Question Text Control (Always Available) -->
                         <div class="space-y-2 bg-white p-2 rounded border border-gray-200">
-                            <input type="text" value="${item.text}" oninput="examData.page${page}[${index}].text = this.value; renderPreview();" class="w-full text-xs p-1.5 border rounded font-semibold" placeholder="اكتب نص السؤال الرئيسي (مثال: أجب عن فرعين فقط / Answer 2 questions):">
+                            <input type="text" value="${item.text}" oninput="examData.page${page}[${index}].text = this.value; renderPreview();" class="w-full text-xs p-1.5 border rounded font-semibold" placeholder="اكتب نص السؤال الرئيسي:">
                             ${item.subs.length === 0 ? `
                             <div class="flex items-center gap-2">
                                 <label class="text-[11px] text-gray-500">نوع السؤال المباشر:</label>
