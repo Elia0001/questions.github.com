@@ -3,20 +3,21 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>نظام جدول الحصص الأسبوعي الموحد</title>
-  <!-- XLSX & html2pdf Libraries for Offline/Online Exporting -->
+  <title>نظام جدول الحصص الأسبوعي الذكي</title>
+  <!-- XLSX & html2pdf Libraries -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
   <style>
     :root {
-      --primary: #1e3a8a;
-      --primary-hover: #1e40af;
-      --secondary: #475569;
-      --bg-color: #f8fafc;
+      --primary: #2563eb;
+      --primary-dark: #1d4ed8;
+      --secondary: #0f172a;
+      --bg: #f8fafc;
       --card-bg: #ffffff;
-      --text-color: #0f172a;
-      --border-color: #cbd5e1;
-      --accent: #2563eb;
+      --border: #e2e8f0;
+      --text: #1e293b;
+      --text-muted: #64748b;
+      --accent: #10b981;
     }
 
     * {
@@ -27,25 +28,20 @@
     }
 
     body {
-      background-color: var(--bg-color);
-      color: var(--text-color);
+      background-color: var(--bg);
+      color: var(--text);
       direction: rtl;
-      padding: 15px;
-    }
-
-    /* Screen Styles */
-    .no-print {
-      max-width: 1200px;
-      margin: 0 auto 20px auto;
-    }
-
-    .header-panel {
-      background: var(--primary);
-      color: white;
       padding: 20px;
-      border-radius: 12px;
-      margin-bottom: 20px;
-      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+    }
+
+    /* Header Styling */
+    .app-header {
+      background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 100%);
+      color: white;
+      padding: 20px 25px;
+      border-radius: 16px;
+      margin-bottom: 25px;
+      box-shadow: 0 10px 15px -3px rgba(37, 99, 235, 0.2);
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -53,31 +49,73 @@
       gap: 15px;
     }
 
-    .header-panel h1 {
-      font-size: 1.5rem;
+    .app-title h1 {
+      font-size: 1.6rem;
+      font-weight: 700;
     }
 
-    .main-grid {
+    .app-title p {
+      font-size: 0.85rem;
+      opacity: 0.9;
+    }
+
+    .action-btn-group {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    /* Button Styling */
+    .btn {
+      padding: 10px 18px;
+      border-radius: 8px;
+      border: none;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s ease;
+      color: white;
+    }
+
+    .btn-primary { background: var(--primary); }
+    .btn-primary:hover { background: var(--primary-dark); }
+    .btn-success { background: #10b981; }
+    .btn-success:hover { background: #059669; }
+    .btn-warning { background: #f59e0b; }
+    .btn-warning:hover { background: #d97706; }
+    .btn-danger { background: #ef4444; }
+    .btn-danger:hover { background: #dc2626; }
+    .btn-sm { padding: 4px 10px; font-size: 0.75rem; border-radius: 6px; }
+
+    /* Layout Grids */
+    .config-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
       gap: 20px;
-      margin-bottom: 20px;
+      margin-bottom: 25px;
     }
 
     .card {
       background: var(--card-bg);
-      border-radius: 12px;
+      border-radius: 14px;
       padding: 20px;
-      border: 1px solid var(--border-color);
-      box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
+      box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
     }
 
-    .card h2 {
+    .card-title {
       font-size: 1.1rem;
+      font-weight: 700;
+      color: var(--secondary);
       margin-bottom: 15px;
-      color: var(--primary);
-      border-bottom: 2px solid #e2e8f0;
+      border-bottom: 2px solid #f1f5f9;
       padding-bottom: 8px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
     }
 
     .form-group {
@@ -86,71 +124,56 @@
 
     .form-group label {
       display: block;
-      font-weight: 600;
       font-size: 0.85rem;
-      margin-bottom: 4px;
+      font-weight: 600;
+      margin-bottom: 5px;
+      color: var(--text);
     }
 
     input[type="text"], input[type="number"], select {
       width: 100%;
-      padding: 8px 12px;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
+      padding: 9px 12px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
       font-size: 0.9rem;
       outline: none;
+      background: #f8fafc;
+      transition: border 0.2s;
     }
 
     input:focus, select:focus {
-      border-color: var(--accent);
+      border-color: var(--primary);
+      background: white;
     }
 
-    .checkbox-group {
+    .checkbox-container {
+      background: #f1f5f9;
+      padding: 10px;
+      border-radius: 8px;
+      max-height: 120px;
+      overflow-y: auto;
       display: flex;
       flex-wrap: wrap;
       gap: 10px;
-      background: #f1f5f9;
-      padding: 10px;
-      border-radius: 6px;
-      max-height: 120px;
-      overflow-y: auto;
     }
 
     .checkbox-item {
       display: flex;
       align-items: center;
-      gap: 5px;
-      font-size: 0.85rem;
-    }
-
-    .btn {
-      background: var(--accent);
-      color: white;
-      border: none;
-      padding: 10px 18px;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.9rem;
-      transition: background 0.2s;
-      display: inline-flex;
-      align-items: center;
       gap: 6px;
+      font-size: 0.85rem;
+      background: white;
+      padding: 4px 8px;
+      border-radius: 6px;
+      border: 1px solid var(--border);
     }
 
-    .btn:hover { background: var(--primary-hover); }
-    .btn-danger { background: #dc2626; }
-    .btn-danger:hover { background: #b91c1c; }
-    .btn-success { background: #16a34a; }
-    .btn-success:hover { background: #15803d; }
-    .btn-warning { background: #d97706; }
-    .btn-warning:hover { background: #b45309; }
-
-    .table-container {
-      max-height: 250px;
+    .table-wrapper {
+      max-height: 220px;
       overflow-y: auto;
-      border: 1px solid var(--border-color);
-      border-radius: 6px;
-      margin-top: 10px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      margin-top: 12px;
     }
 
     table.data-table {
@@ -160,146 +183,120 @@
     }
 
     table.data-table th, table.data-table td {
-      padding: 8px;
+      padding: 8px 10px;
       text-align: right;
-      border-bottom: 1px solid var(--border-color);
+      border-bottom: 1px solid var(--border);
     }
 
     table.data-table th {
       background: #f1f5f9;
       position: sticky;
       top: 0;
+      font-weight: 700;
     }
 
-    /* Print / Preview Schedule Sheet Format */
-    #printArea {
+    /* PDF Printable Master Schedule Styling */
+    #scheduleExportContainer {
       background: white;
-      padding: 10px;
-      margin: 0 auto;
-      width: 100%;
+      padding: 15px;
+      border-radius: 12px;
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05);
+      border: 1px solid var(--border);
     }
 
-    .schedule-header {
-      text-align: center;
-      margin-bottom: 10px;
+    .print-header {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      border-bottom: 2px solid #000;
-      padding-bottom: 5px;
+      border-bottom: 2px solid var(--secondary);
+      padding-bottom: 8px;
+      margin-bottom: 10px;
     }
 
-    .schedule-header h2 {
-      font-size: 1.4rem;
-      font-weight: bold;
-      color: #000;
+    .print-header h2 {
+      font-size: 1.3rem;
+      font-weight: 800;
+      color: var(--secondary);
     }
 
-    .schedule-header p {
-      font-size: 0.85rem;
-      color: #333;
+    .print-header p {
+      font-size: 0.8rem;
+      color: var(--text-muted);
     }
 
-    /* MASTER TABLE STYLES - Single Page Layout */
-    table.master-schedule {
+    table.master-table {
       width: 100%;
       border-collapse: collapse;
       table-layout: fixed;
       direction: rtl;
     }
 
-    table.master-schedule th, 
-    table.master-schedule td {
+    table.master-table th, table.master-table td {
       border: 1px solid #000;
       text-align: center;
       vertical-align: middle;
-      padding: 2px 1px;
-      font-size: 8px; /* Compact font to fit in A4 */
+      padding: 3px 1px;
+      font-size: 8.5px;
       line-height: 1.1;
-      word-wrap: break-word;
+      word-break: break-word;
     }
 
-    table.master-schedule th {
-      background-color: #e2e8f0;
-      font-weight: bold;
+    table.master-table th {
+      background-color: #f1f5f9;
+      font-weight: 800;
       color: #000;
     }
 
-    .th-day { width: 35px; }
-    .th-period { width: 22px; }
-    
-    .cell-subject {
+    .sub-title {
       font-weight: bold;
+      color: #0f172a;
       display: block;
-      color: #1e293b;
     }
-    
-    .cell-teacher {
+
+    .tech-title {
       font-size: 7.5px;
       color: #475569;
       display: block;
     }
 
-    /* PRINT ONLY OPTIMIZATIONS (A4 LANDSCAPE) */
+    /* Print media hiding */
     @media print {
-      @page {
-        size: A4 landscape;
-        margin: 5mm;
-      }
-      body {
-        background: white;
-        padding: 0;
-        margin: 0;
-      }
-      .no-print {
-        display: none !important;
-      }
-      #printArea {
-        padding: 0;
-        width: 100%;
-      }
-      table.master-schedule th, 
-      table.master-schedule td {
-        font-size: 7.5px !important;
-        padding: 1.5px 0.5px !important;
-        border: 1px solid #000 !important;
-      }
-      .cell-teacher {
-        font-size: 7px !important;
-      }
+      .no-print { display: none !important; }
+      body { padding: 0; background: white; }
+      #scheduleExportContainer { border: none; box-shadow: none; padding: 0; }
     }
   </style>
 </head>
 <body>
 
-  <!-- CONTROL PANEL (NO PRINT) -->
+  <!-- APP CONTROL PANEL -->
   <div class="no-print">
-    <div class="header-panel">
-      <div>
-        <h1>نظام جدول الحصص الأسبوعي الموحد</h1>
-        <small>توزيع آلي ذكي - جدول شامِل في ورقة واحدة - بدون تكرار للمدرس بنفس اليوم</small>
+    <div class="app-header">
+      <div class="app-title">
+        <h1>نظام جدول الحصص الأسبوعي الذكي</h1>
+        <p>توزيع تلقائي متعادل - شيت موحد - بدون حواشي وبدون تكرار</p>
       </div>
-      <div style="display: flex; gap: 8px; flex-wrap: wrap;">
-        <button class="btn btn-warning" onclick="generateSchedule()">⚡ توزيع الحصص الآن</button>
+      <div class="action-btn-group">
+        <button class="btn btn-warning" onclick="generateSmartSchedule()">⚡ إعادة التوزيع الذكي</button>
         <button class="btn btn-success" onclick="exportToExcel()">📊 تصدير Excel</button>
-        <button class="btn" onclick="printSchedule()">🖨️ طباعة / حفظ PDF (A4)</button>
+        <button class="btn btn-primary" onclick="exportDirectPDF()">📄 تصدير ملف PDF مباشر</button>
       </div>
     </div>
 
-    <!-- School Info Inputs -->
+    <!-- SCHOOL SETTINGS -->
     <div class="card" style="margin-bottom: 20px;">
       <div style="display: flex; gap: 15px; flex-wrap: wrap;">
-        <div class="form-group" style="flex: 1; min-width: 200px;">
+        <div class="form-group" style="flex: 2; min-width: 220px;">
           <label>اسم المدرسة:</label>
-          <input type="text" id="schoolName" value="ثانوية المستقبل المشرق" oninput="saveData()">
+          <input type="text" id="schoolName" value="متوسطة عقيل بن أبي طالب للبنين" onchange="saveData()">
         </div>
-        <div class="form-group" style="flex: 1; min-width: 200px;">
+        <div class="form-group" style="flex: 1; min-width: 150px;">
           <label>العام الدراسي:</label>
-          <input type="text" id="schoolYear" value="2026 - 2027" oninput="saveData()">
+          <input type="text" id="schoolYear" value="2026 - 2027" onchange="saveData()">
         </div>
-        <div class="form-group" style="width: 150px;">
-          <label>عدد الحصص يومياً:</label>
-          <select id="periodsPerDay" onchange="saveData(); updateScheduleView();">
+        <div class="form-group" style="flex: 1; min-width: 120px;">
+          <label>عدد الحصص/اليوم:</label>
+          <select id="periodsPerDay" onchange="saveData(); renderMasterTable();">
             <option value="5">5 حصص</option>
             <option value="6" selected>6 حصص</option>
             <option value="7">7 حصص</option>
@@ -308,27 +305,28 @@
       </div>
     </div>
 
-    <div class="main-grid">
-      <!-- CLASS & SECTION MANAGEMENT -->
+    <div class="config-grid">
+      <!-- CLASS MANAGEMENT -->
       <div class="card">
-        <h2>1. إضافة الصفوف والشعب</h2>
-        <div class="form-group">
-          <label>اسم الصف (مثال: الأول المتوسط، الرابع العلمي):</label>
-          <input type="text" id="classNameInput" placeholder="أدخل اسم الصف">
+        <div class="card-title">
+          <span>1. إعداد الصفوف والشعب</span>
         </div>
         <div class="form-group">
-          <label>عدد الشعب لهذا الصف:</label>
-          <input type="number" id="classSectionsInput" min="1" max="8" value="2">
-          <small style="color: #64748b;">(سيتم التسمية تلقائياً: أ ، ب ، ج ، د ...)</small>
+          <label>اسم الصف:</label>
+          <input type="text" id="classNameInput" placeholder="مثال: الأول المتوسط">
         </div>
-        <button class="btn" onclick="addClass()">+ إضافة الصف</button>
+        <div class="form-group">
+          <label>عدد الشعب:</label>
+          <input type="number" id="classSectionsInput" min="1" max="8" value="3">
+        </div>
+        <button class="btn btn-primary" style="width: 100%; justify-content: center;" onclick="addClass()">+ إضافة الصف</button>
 
-        <div class="table-container">
+        <div class="table-wrapper">
           <table class="data-table">
             <thead>
               <tr>
                 <th>الصف</th>
-                <th>الشعب</th>
+                <th>الشعب المتاحة</th>
                 <th>إجراء</th>
               </tr>
             </thead>
@@ -339,46 +337,50 @@
 
       <!-- TEACHER MANAGEMENT -->
       <div class="card">
-        <h2>2. إضافة الكادر التدريسي</h2>
+        <div class="card-title">
+          <span id="teacherFormTitle">2. إضافة / تعديل مدرس</span>
+          <button class="btn btn-sm btn-danger" id="cancelEditBtn" style="display: none;" onclick="resetTeacherForm()">إلغاء التعديل</button>
+        </div>
+        <input type="hidden" id="editingTeacherId" value="">
         <div class="form-group">
           <label>اسم المدرس:</label>
-          <input type="text" id="teacherName" placeholder="مثال: أ. أحمد علي">
+          <input type="text" id="teacherName" placeholder="أدخل اسم المدرس">
         </div>
         <div class="form-group">
           <label>المادة / الاختصاص:</label>
           <input type="text" id="teacherSubject" placeholder="مثال: الرياضيات">
         </div>
-        <div class="form-group">
-          <label>النصاب الأسبوعي (عدد الحصص):</label>
-          <input type="number" id="teacherQuota" min="1" max="35" value="16">
-        </div>
-        <div class="form-group">
-          <label>يوم الاستراحة الأسبوعي:</label>
-          <select id="teacherOffDay">
-            <option value="">لا يوجد يوم استراحة</option>
-            <option value="الأحد">الأحد</option>
-            <option value="الإثنين">الإثنين</option>
-            <option value="الثلاثاء">الثلاثاء</option>
-            <option value="الأربعاء">الأربعاء</option>
-            <option value="الخميس">الخميس</option>
-          </select>
+        <div style="display: flex; gap: 10px;">
+          <div class="form-group" style="flex: 1;">
+            <label>النصاب (الحصص):</label>
+            <input type="number" id="teacherQuota" min="1" max="30" value="12">
+          </div>
+          <div class="form-group" style="flex: 1;">
+            <label>يوم الاستراحة:</label>
+            <select id="teacherOffDay">
+              <option value="">لا يوجد</option>
+              <option value="الأحد">الأحد</option>
+              <option value="الإثنين">الإثنين</option>
+              <option value="الثلاثاء">الثلاثاء</option>
+              <option value="الأربعاء">الأربعاء</option>
+              <option value="الخميس">الخميس</option>
+            </select>
+          </div>
         </div>
         <div class="form-group">
           <label>الشعب الموكلة للمدرس:</label>
-          <div class="checkbox-group" id="teacherSectionsCheckboxes">
-            <small style="color: #64748b;">قم بإضافة صفوف أولاً لتظهر الشعب هنا</small>
-          </div>
+          <div class="checkbox-container" id="teacherSectionsContainer"></div>
         </div>
-        <button class="btn" onclick="addTeacher()">+ إضافة المدرس</button>
+        <button class="btn btn-success" id="saveTeacherBtn" style="width: 100%; justify-content: center;" onclick="saveTeacher()">+ حفظ المدرس</button>
 
-        <div class="table-container">
+        <div class="table-wrapper">
           <table class="data-table">
             <thead>
               <tr>
                 <th>المدرس</th>
                 <th>المادة</th>
                 <th>النصاب</th>
-                <th>الاستراحة</th>
+                <th>الشعب الموكلة</th>
                 <th>إجراء</th>
               </tr>
             </thead>
@@ -389,14 +391,14 @@
     </div>
   </div>
 
-  <!-- PRINTABLE SINGLE PAGE MASTER SCHEDULE -->
-  <div id="printArea">
-    <div class="schedule-header">
+  <!-- MASTER SCHEDULE DISPLAY & PDF TARGET AREA -->
+  <div id="scheduleExportContainer">
+    <div class="print-header">
       <div style="text-align: right;">
         <p>مديرية التربية</p>
-        <p>مدرسة: <span id="dispSchoolName">...............</span></p>
+        <p>مدرسة: <span id="dispSchoolName" style="font-weight: bold; color:#000;">---------------</span></p>
       </div>
-      <div>
+      <div style="text-align: center;">
         <h2>جدول الحصص الأسبوعي الموحد</h2>
         <p>للسنة الدراسية <span id="dispSchoolYear">2026-2027</span></p>
       </div>
@@ -406,40 +408,31 @@
       </div>
     </div>
 
-    <table class="master-schedule" id="masterScheduleTable">
-      <thead id="masterTableHead">
-        <!-- Generated Dynamically -->
-      </thead>
-      <tbody id="masterTableBody">
-        <!-- Generated Dynamically -->
-      </tbody>
+    <table class="master-table" id="masterScheduleTable">
+      <thead id="masterTableHead"></thead>
+      <tbody id="masterTableBody"></tbody>
     </table>
   </div>
 
   <script>
-    // System State
     const days = ['الأحد', 'الإثنين', 'الثلاثاء', 'الأربعاء', 'الخميس'];
     const alphabet = ['أ', 'ب', 'ج', 'د', 'هـ', 'و', 'ز', 'ح'];
 
     let appData = {
-      schoolName: 'ثانوية المستقبل المشرق',
+      schoolName: 'متوسطة عقيل بن أبي طالب للبنين',
       schoolYear: '2026 - 2027',
       periodsPerDay: 6,
-      classes: [],  // { id, name, sections: ['أ', 'ب'] }
-      teachers: [], // { id, name, subject, quota, offDay, assignedSections: ['classId_secIndex'] }
-      schedule: {}  // { "day_period_classId_secIndex": { teacherName, subject } }
+      classes: [],
+      teachers: [],
+      schedule: {}
     };
 
-    // Load Data On Startup
     window.onload = function() {
-      const saved = localStorage.getItem('school_timetable_master_v3');
+      const saved = localStorage.getItem('school_timetable_app_v4');
       if (saved) {
-        try {
-          appData = JSON.parse(saved);
-        } catch(e){}
+        try { appData = JSON.parse(saved); } catch(e){}
       }
-      
-      // Defaults if empty
+
       if (appData.classes.length === 0) {
         appData.classes = [
           { id: 'c1', name: 'الأول المتوسط', sections: ['أ', 'ب', 'ج'] },
@@ -447,71 +440,54 @@
           { id: 'c3', name: 'الثالث المتوسط', sections: ['أ', 'ب', 'ج'] }
         ];
         appData.teachers = [
-          { id: 't1', name: 'أ. أحمد علي', subject: 'الرياضيات', quota: 15, offDay: 'الثلاثاء', assignedSections: ['c1_0', 'c1_1'] },
-          { id: 't2', name: 'ست زينب كاظم', subject: 'الإنجليزي', quota: 15, offDay: '', assignedSections: ['c1_0', 'c2_0'] },
-          { id: 't3', name: 'حيدر الساعدي', subject: 'الإسلامية', quota: 12, offDay: 'الخميس', assignedSections: ['c1_0', 'c3_0'] },
-          { id: 't4', name: 'د. خالد الزبيدي', subject: 'العلوم العامة', quota: 14, offDay: '', assignedSections: ['c2_0', 'c3_1'] }
+          { id: 't1', name: 'أ. ضياء', subject: 'فنون', quota: 12, offDay: 'الخميس', assignedSections: ['c1_0', 'c1_1', 'c1_2'] },
+          { id: 't2', name: 'أ. أحمد', subject: 'فيزياء', quota: 16, offDay: '', assignedSections: ['c1_0', 'c2_0', 'c3_1'] },
+          { id: 't3', name: 'أ. حسن', subject: 'إسلامية', quota: 14, offDay: 'الثلاثاء', assignedSections: ['c1_1', 'c2_1', 'c3_0'] },
+          { id: 't4', name: 'أ. باقر', subject: 'اجتماعيات', quota: 18, offDay: '', assignedSections: ['c1_2', 'c3_0', 'c3_1', 'c3_2'] }
         ];
       }
 
-      document.getElementById('schoolName').value = appData.schoolName || '';
-      document.getElementById('schoolYear').value = appData.schoolYear || '';
+      document.getElementById('schoolName').value = appData.schoolName;
+      document.getElementById('schoolYear').value = appData.schoolYear;
       document.getElementById('periodsPerDay').value = appData.periodsPerDay || 6;
 
       renderClasses();
-      renderTeacherCheckboxes();
+      renderTeacherSectionsCheckboxes();
       renderTeachers();
-      updateScheduleView();
+      renderMasterTable();
     };
 
     function saveData() {
       appData.schoolName = document.getElementById('schoolName').value;
       appData.schoolYear = document.getElementById('schoolYear').value;
       appData.periodsPerDay = parseInt(document.getElementById('periodsPerDay').value);
-      
-      document.getElementById('dispSchoolName').innerText = appData.schoolName || '...............';
-      document.getElementById('dispSchoolYear').innerText = appData.schoolYear || '2026-2027';
-
-      localStorage.setItem('school_timetable_master_v3', JSON.stringify(appData));
+      localStorage.setItem('school_timetable_app_v4', JSON.stringify(appData));
     }
 
-    /* Class Management */
+    /* CLASSES LOGIC */
     function addClass() {
-      const nameInput = document.getElementById('classNameInput');
-      const countInput = document.getElementById('classSectionsInput');
-      const name = nameInput.value.trim();
-      const count = parseInt(countInput.value) || 1;
-
-      if (!name) {
-        alert('يرجى كتابة اسم الصف');
-        return;
-      }
+      const name = document.getElementById('classNameInput').value.trim();
+      const count = parseInt(document.getElementById('classSectionsInput').value) || 1;
+      if (!name) return alert('يرجى إضافة اسم الصف');
 
       const sections = [];
-      for (let i = 0; i < count; i++) {
-        sections.push(alphabet[i] || `ش${i+1}`);
-      }
+      for (let i = 0; i < count; i++) sections.push(alphabet[i] || `ش${i+1}`);
 
-      appData.classes.push({
-        id: 'c_' + Date.now(),
-        name: name,
-        sections: sections
-      });
-
-      nameInput.value = '';
+      appData.classes.push({ id: 'c_' + Date.now(), name, sections });
+      document.getElementById('classNameInput').value = '';
       saveData();
       renderClasses();
-      renderTeacherCheckboxes();
-      updateScheduleView();
+      renderTeacherSectionsCheckboxes();
+      renderMasterTable();
     }
 
     function removeClass(id) {
-      if (confirm('هل أنت تأكد من حذف هذا الصف؟')) {
+      if (confirm('هل أنت تأكد من حذف الصف؟')) {
         appData.classes = appData.classes.filter(c => c.id !== id);
         saveData();
         renderClasses();
-        renderTeacherCheckboxes();
-        updateScheduleView();
+        renderTeacherSectionsCheckboxes();
+        renderMasterTable();
       }
     }
 
@@ -519,186 +495,232 @@
       const tbody = document.getElementById('classesTableBody');
       tbody.innerHTML = '';
       appData.classes.forEach(c => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${c.name}</td>
-          <td>${c.sections.map(s => 'شعبة ' + s).join(', ')}</td>
-          <td><button class="btn btn-danger" style="padding: 3px 8px; font-size: 0.75rem;" onclick="removeClass('${c.id}')">حذف</button></td>
+        tbody.innerHTML += `
+          <tr>
+            <td>${c.name}</td>
+            <td>${c.sections.map(s => 'شعبة ' + s).join(', ')}</td>
+            <td><button class="btn btn-sm btn-danger" onclick="removeClass('${c.id}')">حذف</button></td>
+          </tr>
         `;
-        tbody.appendChild(tr);
       });
     }
 
-    /* Teacher Management */
-    function renderTeacherCheckboxes() {
-      const container = document.getElementById('teacherSectionsCheckboxes');
+    /* TEACHERS LOGIC */
+    function renderTeacherSectionsCheckboxes(selectedArray = []) {
+      const container = document.getElementById('teacherSectionsContainer');
       container.innerHTML = '';
-
       if (appData.classes.length === 0) {
-        container.innerHTML = '<small style="color: #64748b;">قم بإضافة صفوف أولاً لتظهر الشعب هنا</small>';
+        container.innerHTML = '<small style="color:#64748b">أضف صفوفاً أولاً</small>';
         return;
       }
 
       appData.classes.forEach(c => {
-        c.sections.forEach((sec, idx) => {
-          const val = `${c.id}_${idx}`;
-          const label = document.createElement('label');
-          label.className = 'checkbox-item';
-          label.innerHTML = `
-            <input type="checkbox" value="${val}" class="teacher-sec-cb">
-            <span>${c.name} (${sec})</span>
+        c.sections.forEach((sec, sIdx) => {
+          const val = `${c.id}_${sIdx}`;
+          const checked = selectedArray.includes(val) ? 'checked' : '';
+          container.innerHTML += `
+            <label class="checkbox-item">
+              <input type="checkbox" value="${val}" class="teacher-sec-cb" ${checked}>
+              <span>${c.name} (${sec})</span>
+            </label>
           `;
-          container.appendChild(label);
         });
       });
     }
 
-    function addTeacher() {
+    function saveTeacher() {
+      const editId = document.getElementById('editingTeacherId').value;
       const name = document.getElementById('teacherName').value.trim();
       const subject = document.getElementById('teacherSubject').value.trim();
       const quota = parseInt(document.getElementById('teacherQuota').value) || 0;
       const offDay = document.getElementById('teacherOffDay').value;
 
-      const checkedBoxes = document.querySelectorAll('.teacher-sec-cb:checked');
-      const assignedSections = Array.from(checkedBoxes).map(cb => cb.value);
+      const checkedBoxes = Array.from(document.querySelectorAll('.teacher-sec-cb:checked')).map(cb => cb.value);
 
-      if (!name || !subject) {
-        alert('يرجى ملء اسم المدرس والاختصاص');
-        return;
+      if (!name || !subject) return alert('يرجى ملء كافة تفاصيل المدرس');
+
+      if (editId) {
+        const index = appData.teachers.findIndex(t => t.id === editId);
+        if (index !== -1) {
+          appData.teachers[index] = { id: editId, name, subject, quota, offDay, assignedSections: checkedBoxes };
+        }
+      } else {
+        appData.teachers.push({ id: 't_' + Date.now(), name, subject, quota, offDay, assignedSections: checkedBoxes });
       }
 
-      appData.teachers.push({
-        id: 't_' + Date.now(),
-        name,
-        subject,
-        quota,
-        offDay,
-        assignedSections
-      });
-
-      // Clear Form
-      document.getElementById('teacherName').value = '';
-      document.getElementById('teacherSubject').value = '';
-      document.querySelectorAll('.teacher-sec-cb').forEach(cb => cb.checked = false);
-
+      resetTeacherForm();
       saveData();
       renderTeachers();
     }
 
+    function editTeacher(id) {
+      const t = appData.teachers.find(item => item.id === id);
+      if (!t) return;
+
+      document.getElementById('editingTeacherId').value = t.id;
+      document.getElementById('teacherName').value = t.name;
+      document.getElementById('teacherSubject').value = t.subject;
+      document.getElementById('teacherQuota').value = t.quota;
+      document.getElementById('teacherOffDay').value = t.offDay || '';
+      
+      document.getElementById('teacherFormTitle').innerText = 'تعديل بيانات المدرس';
+      document.getElementById('saveTeacherBtn').innerText = 'تحديث المدرس';
+      document.getElementById('cancelEditBtn').style.display = 'inline-block';
+
+      renderTeacherSectionsCheckboxes(t.assignedSections);
+    }
+
+    function resetTeacherForm() {
+      document.getElementById('editingTeacherId').value = '';
+      document.getElementById('teacherName').value = '';
+      document.getElementById('teacherSubject').value = '';
+      document.getElementById('teacherQuota').value = '12';
+      document.getElementById('teacherOffDay').value = '';
+      
+      document.getElementById('teacherFormTitle').innerText = '2. إضافة / تعديل مدرس';
+      document.getElementById('saveTeacherBtn').innerText = '+ حفظ المدرس';
+      document.getElementById('cancelEditBtn').style.display = 'none';
+
+      renderTeacherSectionsCheckboxes();
+    }
+
     function removeTeacher(id) {
-      appData.teachers = appData.teachers.filter(t => t.id !== id);
-      saveData();
-      renderTeachers();
+      if (confirm('تأكيد حذف المدرس؟')) {
+        appData.teachers = appData.teachers.filter(t => t.id !== id);
+        saveData();
+        renderTeachers();
+      }
+    }
+
+    function getAssignedSectionsText(assigned) {
+      if (!assigned || assigned.length === 0) return 'لا يوجد';
+      return assigned.map(val => {
+        const [cId, sIdx] = val.split('_');
+        const c = appData.classes.find(cls => cls.id === cId);
+        if (c && c.sections[sIdx]) {
+          return `${c.name} (${c.sections[sIdx]})`;
+        }
+        return '';
+      }).filter(Boolean).join(', ');
     }
 
     function renderTeachers() {
       const tbody = document.getElementById('teachersTableBody');
       tbody.innerHTML = '';
       appData.teachers.forEach(t => {
-        const tr = document.createElement('tr');
-        tr.innerHTML = `
-          <td>${t.name}</td>
-          <td>${t.subject}</td>
-          <td>${t.quota}</td>
-          <td>${t.offDay || 'لا يوجد'}</td>
-          <td><button class="btn btn-danger" style="padding: 3px 8px; font-size: 0.75rem;" onclick="removeTeacher('${t.id}')">حذف</button></td>
+        tbody.innerHTML += `
+          <tr>
+            <td>${t.name}</td>
+            <td>${t.subject}</td>
+            <td>${t.quota}</td>
+            <td style="font-size:0.75rem; color:#475569;">${getAssignedSectionsText(t.assignedSections)}</td>
+            <td>
+              <button class="btn btn-sm btn-primary" onclick="editTeacher('${t.id}')">تعديل</button>
+              <button class="btn btn-sm btn-danger" onclick="removeTeacher('${t.id}')">حذف</button>
+            </td>
+          </tr>
         `;
-        tbody.appendChild(tr);
       });
     }
 
-    /* AUTOMATIC TIMETABLE DISTRIBUTION ALGORITHM */
-    function generateSchedule() {
+    /* SMART BALANCED DISTRIBUTION ALGORITHM */
+    function generateSmartSchedule() {
       if (appData.classes.length === 0 || appData.teachers.length === 0) {
-        alert('يرجى إضافة صفوف ومدرسين أولاً لقدرة النظام على التوزيع');
-        return;
+        return alert('أضف صفوفاً ومدرسين أولاً');
       }
 
       saveData();
       const periodsCount = appData.periodsPerDay;
       const newSchedule = {};
 
-      // Build target slots list
-      const targetSlots = [];
-      appData.classes.forEach(c => {
-        c.sections.forEach((sec, sIdx) => {
-          const secKey = `${c.id}_${sIdx}`;
-          days.forEach(day => {
+      // 1. Calculate remaining quotas
+      const remainingQuota = {};
+      const teacherDailyLimit = {};
+
+      appData.teachers.forEach(t => {
+        remainingQuota[t.id] = t.quota;
+        // Target max lessons per day (e.g. Quota 15 / 5 days = max ~3 lessons a day)
+        teacherDailyLimit[t.id] = Math.ceil(t.quota / 4); 
+      });
+
+      // Track Teacher Occupations
+      const teacherOccupied = {}; // "day_period" -> teacherId
+      const teacherDailyCount = {}; // "day_teacherId" -> count
+      const teacherSectionDaily = {}; // "day_secKey_teacherId" -> true (STRICT NO DUPLICATE PER SECTION PER DAY)
+
+      // Loop day by day for even distribution
+      days.forEach(day => {
+        appData.classes.forEach(c => {
+          c.sections.forEach((sec, sIdx) => {
+            const secKey = `${c.id}_${sIdx}`;
+
             for (let p = 1; p <= periodsCount; p++) {
-              targetSlots.push({ day, period: p, classId: c.id, secIndex: sIdx, secKey });
+              // Find suitable teacher
+              const candidates = appData.teachers.filter(t => {
+                if (!t.assignedSections.includes(secKey)) return false;
+                if (remainingQuota[t.id] <= 0) return false;
+                if (t.offDay === day) return false;
+                if (teacherOccupied[`${day}_${p}`] === t.id) return false;
+                
+                // NO DUPLICATE IN SAME CLASS ON SAME DAY
+                if (teacherSectionDaily[`${day}_${secKey}_${t.id}`]) return false;
+
+                // Daily workload balance check
+                const currentDaily = teacherDailyCount[`${day}_${t.id}`] || 0;
+                if (currentDaily >= teacherDailyLimit[t.id]) return false;
+
+                return true;
+              });
+
+              let selectedTeacher = null;
+
+              if (candidates.length > 0) {
+                // Sort by highest remaining quota
+                candidates.sort((a, b) => remainingQuota[b.id] - remainingQuota[a.id]);
+                selectedTeacher = candidates[0];
+              } else {
+                // Fallback: relax daily limit if needed to prevent empty slots
+                const fallbackCandidates = appData.teachers.filter(t => {
+                  if (!t.assignedSections.includes(secKey)) return false;
+                  if (remainingQuota[t.id] <= 0) return false;
+                  if (t.offDay === day) return false;
+                  if (teacherOccupied[`${day}_${p}`] === t.id) return false;
+                  if (teacherSectionDaily[`${day}_${secKey}_${t.id}`]) return false;
+                  return true;
+                });
+
+                if (fallbackCandidates.length > 0) {
+                  fallbackCandidates.sort((a, b) => remainingQuota[b.id] - remainingQuota[a.id]);
+                  selectedTeacher = fallbackCandidates[0];
+                }
+              }
+
+              if (selectedTeacher) {
+                const slotKey = `${day}_${p}_${secKey}`;
+                newSchedule[slotKey] = {
+                  teacherName: selectedTeacher.name,
+                  subject: selectedTeacher.subject
+                };
+
+                remainingQuota[selectedTeacher.id]--;
+                teacherOccupied[`${day}_${p}`] = selectedTeacher.id;
+                teacherDailyCount[`${day}_${selectedTeacher.id}`] = (teacherDailyCount[`${day}_${selectedTeacher.id}`] || 0) + 1;
+                teacherSectionDaily[`${day}_${secKey}_${selectedTeacher.id}`] = true;
+              }
             }
           });
         });
       });
 
-      // Shuffle slots for organic distribution
-      targetSlots.sort(() => Math.random() - 0.5);
-
-      // Track Teacher Assigned Quota
-      const teacherAssignedCount = {};
-      appData.teachers.forEach(t => { teacherAssignedCount[t.id] = 0; });
-
-      // Track Teacher Occupied Slots: { "day_period": teacherId }
-      const teacherBusySlot = {};
-
-      // STRICT RULE REQUIREMENT: Track Teacher-Section Daily Limit
-      // { "day_secKey_teacherId": true } -> Prevents a teacher from teaching the SAME section more than ONCE per day
-      const teacherSectionDailyAssignment = {};
-
-      // Attempt assignment
-      targetSlots.forEach(slot => {
-        const { day, period, secKey } = slot;
-
-        // Find candidate teachers for this section
-        const candidates = appData.teachers.filter(t => {
-          // Must be assigned to this section
-          if (!t.assignedSections.includes(secKey)) return false;
-          // Must not exceed quota
-          if (teacherAssignedCount[t.id] >= t.quota) return false;
-          // Must not be on off day
-          if (t.offDay === day) return false;
-          // Must not be busy in another class at the same day & period
-          if (teacherBusySlot[`${day}_${period}`] === t.id) return false;
-
-          // STRICT RULE 2: CANNOT TEACH THE SAME SECTION TWICE IN THE SAME DAY
-          if (teacherSectionDailyAssignment[`${day}_${secKey}_${t.id}`]) return false;
-
-          return true;
-        });
-
-        if (candidates.length > 0) {
-          // Sort candidates by remaining quota priority
-          candidates.sort((a, b) => {
-            const remA = a.quota - teacherAssignedCount[a.id];
-            const remB = b.quota - teacherAssignedCount[b.id];
-            return remB - remA;
-          });
-
-          const selectedTeacher = candidates[0];
-
-          // Save assignment
-          const slotKey = `${day}_${period}_${secKey}`;
-          newSchedule[slotKey] = {
-            teacherName: selectedTeacher.name,
-            subject: selectedTeacher.subject
-          };
-
-          // Update tracking
-          teacherAssignedCount[selectedTeacher.id]++;
-          teacherBusySlot[`${day}_${period}`] = selectedTeacher.id;
-          teacherSectionDailyAssignment[`${day}_${secKey}_${selectedTeacher.id}`] = true;
-        }
-      });
-
       appData.schedule = newSchedule;
       saveData();
-      updateScheduleView();
-      alert('تم إجراء التوزيع التلقائي الذكي بنجاح بدون أي تكرار للمدرس بنفس الشعبة في اليوم الواحد!');
+      renderMasterTable();
+      alert('تم إجراء التوزيع الأسبوعي المتوازن بنجاح خالي من التكرارات!');
     }
 
-    /* RENDER SINGLE MASTER SHEET TABLE */
-    function updateScheduleView() {
-      document.getElementById('dispSchoolName').innerText = appData.schoolName || '...............';
+    /* RENDER SINGLE MASTER TABLE SHEET */
+    function renderMasterTable() {
+      document.getElementById('dispSchoolName').innerText = appData.schoolName || '---------------';
       document.getElementById('dispSchoolYear').innerText = appData.schoolYear || '2026-2027';
 
       const thead = document.getElementById('masterTableHead');
@@ -708,43 +730,36 @@
       tbody.innerHTML = '';
 
       if (appData.classes.length === 0) {
-        tbody.innerHTML = '<tr><td colspan="10" style="padding: 20px;">لا توجد صفوف مضافة حالياً.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="12" style="padding: 20px;">لا يوجد صفوف مضافة حالياً.</td></tr>';
         return;
       }
 
-      // Build Header Row 1: Classes & Row 2: Sections
-      let headerRow1 = `<tr><th class="th-day" rowspan="2">اليوم</th><th class="th-period" rowspan="2">الحصة</th>`;
-      let headerRow2 = `<tr>`;
+      let row1 = `<tr><th style="width:32px;" rowspan="2">اليوم</th><th style="width:20px;" rowspan="2">د</th>`;
+      let row2 = `<tr>`;
 
       appData.classes.forEach(c => {
-        const secCount = c.sections.length;
-        headerRow1 += `<th colspan="${secCount}">${c.name}</th>`;
-        c.sections.forEach(sec => {
-          headerRow2 += `<th>شعبة (${sec})</th>`;
+        row1 += `<th colspan="${c.sections.length}">${c.name}</th>`;
+        c.sections.forEach(s => {
+          row2 += `<th>شعبة (${s})</th>`;
         });
       });
 
-      headerRow1 += `</tr>`;
-      headerRow2 += `</tr>`;
+      row1 += `</tr>`;
+      row2 += `</tr>`;
+      thead.innerHTML = row1 + row2;
 
-      thead.innerHTML = headerRow1 + headerRow2;
-
-      // Build Body Rows: Days -> Periods -> Class Sections
       const periodsCount = appData.periodsPerDay;
 
-      days.forEach((day, dIdx) => {
+      days.forEach(day => {
         for (let p = 1; p <= periodsCount; p++) {
           const tr = document.createElement('tr');
 
-          // Day Cell with rowspan
           if (p === 1) {
-            tr.innerHTML += `<td class="th-day" rowspan="${periodsCount}" style="font-weight:bold; background:#f8fafc;">${day}</td>`;
+            tr.innerHTML += `<td rowspan="${periodsCount}" style="font-weight:bold; background:#f8fafc;">${day}</td>`;
           }
 
-          // Period Number
-          tr.innerHTML += `<td class="th-period" style="font-weight:bold;">${p}</td>`;
+          tr.innerHTML += `<td style="font-weight:bold;">${p}</td>`;
 
-          // Cell for each section
           appData.classes.forEach(c => {
             c.sections.forEach((sec, sIdx) => {
               const secKey = `${c.id}_${sIdx}`;
@@ -754,8 +769,8 @@
               if (lesson) {
                 tr.innerHTML += `
                   <td>
-                    <span class="cell-subject">${lesson.subject}</span>
-                    <span class="cell-teacher">${lesson.teacherName}</span>
+                    <span class="sub-title">${lesson.subject}</span>
+                    <span class="tech-title">${lesson.teacherName}</span>
                   </td>
                 `;
               } else {
@@ -769,15 +784,26 @@
       });
     }
 
-    /* PRINT AND EXPORT */
-    function printSchedule() {
-      window.print();
+    /* DIRECT PDF EXPORT WITHOUT BROWSER FOOTER/HEADER */
+    function exportDirectPDF() {
+      const element = document.getElementById('scheduleExportContainer');
+      const filename = `جدول_الحصص_${appData.schoolName}.pdf`;
+
+      const opt = {
+        margin: [4, 4, 4, 4], // tight margin
+        filename: filename,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+      };
+
+      html2pdf().set(opt).from(element).save();
     }
 
     function exportToExcel() {
       const table = document.getElementById('masterScheduleTable');
-      const wb = XLSX.utils.table_to_book(table, { sheet: "جدول الحصص الموحد" });
-      XLSX.writeFile(wb, `جدول_الحصص_الموحد_${appData.schoolName}.xlsx`);
+      const wb = XLSX.utils.table_to_book(table, { sheet: "جدول الحصص" });
+      XLSX.writeFile(wb, `جدول_الحصص_${appData.schoolName}.xlsx`);
     }
   </script>
 </body>
