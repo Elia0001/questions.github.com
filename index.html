@@ -3,24 +3,22 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>نظام جدول الحصص الأسبوعي الموحد (الجدول الشامل)</title>
+    <title>نظام جدول الحصص الأسبوعي الموحد (الجدول الشامل A4)</title>
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- FontAwesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts Cairo -->
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Google Fonts Tajawal & Cairo -->
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;500;700;800;900&display=swap" rel="stylesheet">
     <!-- SheetJS for Excel Export -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- html2pdf.js for PDF Export -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        cairo: ['Cairo', 'sans-serif'],
+                        tajawal: ['Tajawal', 'Tahoma', 'Arial', 'sans-serif'],
                     },
                     colors: {
                         brand: {
@@ -38,12 +36,27 @@
         }
     </script>
     <style>
-        body {
-            font-family: 'Cairo', sans-serif;
-            background-color: #f8fafc;
+        * {
+            box-sizing: border-box;
         }
 
-        /* Printable Master Sheet Adjustments */
+        body {
+            font-family: 'Tajawal', 'Tahoma', 'Arial', sans-serif;
+            background-color: #f8fafc;
+            direction: rtl;
+            text-align: right;
+        }
+
+        /* Prevent Text Distortion in Print/PDF */
+        .pdf-title-fix {
+            letter-spacing: 0px !important;
+            word-spacing: normal !important;
+            font-family: 'Tajawal', 'Tahoma', 'Arial', sans-serif !important;
+            direction: rtl !important;
+            unicode-bidi: embed !important;
+        }
+
+        /* Printable Master Sheet Adjustments for exact A4 Landscape fit */
         @media print {
             .no-print {
                 display: none !important;
@@ -51,51 +64,71 @@
             .print-only {
                 display: block !important;
             }
-            body {
-                background: white;
-                color: black;
-                margin: 0;
-                padding: 0;
+            body, html {
+                background: white !important;
+                color: black !important;
+                margin: 0 !important;
+                padding: 0 !important;
+                width: 100% !important;
+                height: 100% !important;
             }
             @page {
-                size: A3 landscape;
-                margin: 5mm;
+                size: A4 landscape;
+                margin: 4mm;
             }
-            .master-table-container {
+            
+            #masterSheetPrintArea {
+                box-shadow: none !important;
+                border: none !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                width: 100% !important;
+            }
+
+            .master-scroll {
                 overflow: visible !important;
+                max-height: none !important;
             }
+
             table {
                 font-size: 8px !important;
                 border-collapse: collapse !important;
                 width: 100% !important;
+                table-layout: fixed !important;
             }
+
             th, td {
-                padding: 2px !important;
-                border: 1px solid #000 !important;
+                padding: 1.5px 1px !important;
+                border: 1px solid #1e293b !important;
+                line-height: 1.1 !important;
+                word-wrap: break-word !important;
             }
+
             .cell-box {
-                min-height: 22px !important;
+                min-height: 18px !important;
+                height: 18px !important;
+            }
+
+            .sticky-col, .sticky-header {
+                position: static !important;
             }
         }
 
-        /* Custom scrollbar for large master grid */
+        /* Custom scrollbar for web view */
         .master-scroll::-webkit-scrollbar {
-            height: 10px;
-            width: 8px;
+            height: 8px;
+            width: 6px;
         }
         .master-scroll::-webkit-scrollbar-track {
             background: #e2e8f0;
-            border-radius: 6px;
+            border-radius: 4px;
         }
         .master-scroll::-webkit-scrollbar-thumb {
             background: #0284c7;
-            border-radius: 6px;
-        }
-        .master-scroll::-webkit-scrollbar-thumb:hover {
-            background: #0369a1;
+            border-radius: 4px;
         }
 
-        /* Table sticky headers */
+        /* Sticky headers for web table */
         .sticky-col {
             position: sticky;
             right: 0;
@@ -119,8 +152,8 @@
                         <i class="fa-solid fa-table-cells text-3xl text-amber-300"></i>
                     </div>
                     <div>
-                        <h1 class="text-xl sm:text-2xl font-black tracking-tight">جدول الحصص الأسبوعي الموحد</h1>
-                        <p class="text-xs text-sky-200 font-light mt-0.5">التوزيع الموحد لجميع الصفوف والشعب في ورقة واحدة (نموذج المدرسة الورقي)</p>
+                        <h1 class="text-xl sm:text-2xl font-black tracking-normal pdf-title-fix">جدول الحصص الأسبوعي الموحد</h1>
+                        <p class="text-xs text-sky-200 font-light mt-0.5">جدول شامل لجميع الصفوف والشعب مطبوع في ورقة A4 واحدة</p>
                     </div>
                 </div>
 
@@ -139,7 +172,7 @@
                 <nav class="flex space-x-2 space-x-reverse overflow-x-auto py-2" id="navTabs">
                     <button onclick="switchTab('masterTableTab')" id="btn-masterTableTab" class="tab-btn active px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-2 bg-white/20 text-white shadow-sm">
                         <i class="fa-solid fa-sheet-plastic text-amber-300"></i>
-                        <span>الجدول الورقي الموحد (اللوحة الشاملة)</span>
+                        <span>الجدول الورقي الموحد (اللوحة الشاملة A4)</span>
                     </button>
                     <button onclick="switchTab('teachersTab')" id="btn-teachersTab" class="tab-btn px-4 py-2 rounded-xl font-bold text-xs sm:text-sm transition flex items-center gap-2 text-sky-100 hover:bg-white/10">
                         <i class="fa-solid fa-chalkboard-user"></i>
@@ -157,7 +190,6 @@
     <!-- Toast Notifications -->
     <div id="toastContainer" class="fixed bottom-5 left-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-    <!-- Main Container -->
     <main class="flex-grow w-full max-w-[1600px] mx-auto px-2 sm:px-4 lg:px-6 py-6">
 
         <section id="masterTableTab" class="tab-content transition-all duration-300">
@@ -168,7 +200,7 @@
                     <div class="flex items-center gap-3 flex-wrap w-full lg:w-auto">
                         <button onclick="generateSchedule()" class="px-5 py-2.5 bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-slate-950 font-black rounded-xl shadow-md transition flex items-center gap-2 text-xs sm:text-sm">
                             <i class="fa-solid fa-wand-magic-sparkles"></i>
-                            <span>إعادة التوزيع الذكي التلقائي</span>
+                            <span>إعادة التوزيع الذكي (بدون تكرار)</span>
                         </button>
 
                         <div class="flex items-center gap-2 bg-slate-100 px-3 py-1.5 rounded-xl border border-slate-200 text-xs">
@@ -184,42 +216,38 @@
                     <div class="flex items-center gap-2 flex-wrap w-full lg:w-auto justify-end">
                         <button onclick="exportMasterToExcel()" class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold shadow-sm transition flex items-center gap-2">
                             <i class="fa-solid fa-file-excel text-sm"></i>
-                            <span>تصدير Excel الشامل</span>
-                        </button>
-                        <button onclick="exportMasterToPDF()" class="px-4 py-2 bg-red-600 hover:bg-red-700 text-white rounded-xl text-xs font-bold shadow-sm transition flex items-center gap-2">
-                            <i class="fa-solid fa-file-pdf text-sm"></i>
-                            <span>تصدير PDF معلق جداري</span>
+                            <span>تصدير Excel</span>
                         </button>
                         <button onclick="window.print()" class="px-4 py-2 bg-slate-800 hover:bg-slate-900 text-white rounded-xl text-xs font-bold shadow-sm transition flex items-center gap-2">
                             <i class="fa-solid fa-print text-sm"></i>
-                            <span>طباعة مباشرة (A3 / A4)</span>
+                            <span>طباعة / حفظ PDF ورقة واحدة (A4)</span>
                         </button>
                     </div>
                 </div>
             </div>
 
             <!-- Master Sheet Printable Board -->
-            <div id="masterSheetPrintArea" class="bg-white rounded-2xl shadow-sm border border-slate-300 p-4 sm:p-6 mb-8 overflow-hidden">
+            <div id="masterSheetPrintArea" class="bg-white rounded-2xl shadow-sm border border-slate-300 p-4 sm:p-5 mb-8 overflow-hidden">
                 
                 <!-- Print Document Header -->
-                <div class="text-center mb-4 pb-3 border-b-2 border-slate-800 flex justify-between items-center px-4">
+                <div class="text-center mb-2 pb-2 border-b-2 border-slate-800 flex justify-between items-center px-2">
                     <div class="text-right">
-                        <h2 class="text-xs font-bold text-slate-500">مديرية التربية</h2>
-                        <h3 class="text-sm font-black text-slate-800" id="schoolHeaderName">مدرسة : (.......................)</h3>
+                        <h2 class="text-[10px] sm:text-xs font-bold text-slate-500">مديرية التربية</h2>
+                        <h3 class="text-xs sm:text-sm font-black text-slate-800 pdf-title-fix" id="schoolHeaderName">مدرسة : (.......................)</h3>
                     </div>
                     <div class="text-center">
-                        <h1 class="text-xl sm:text-2xl font-black text-slate-900 tracking-wide">جدول الحصص الأسبوعي الموحد</h1>
-                        <p class="text-xs text-slate-600 font-bold mt-0.5" id="academicYearText">للسنة الدراسية 2026 - 2027</p>
+                        <h1 class="text-base sm:text-xl font-black text-slate-900 pdf-title-fix">جدول الحصص الأسبوعي الموحد</h1>
+                        <p class="text-[10px] sm:text-xs text-slate-600 font-bold" id="academicYearText">للسنة الدراسية 2026 - 2027</p>
                     </div>
                     <div class="text-left">
-                        <span class="text-xs font-bold text-slate-500 block">التاريخ: ____/____/________</span>
-                        <span class="text-xs font-bold text-slate-500 block">إدارة المدرسة</span>
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-500 block">التاريخ: ____/____/________</span>
+                        <span class="text-[10px] sm:text-xs font-bold text-slate-500 block">إدارة المدرسة</span>
                     </div>
                 </div>
 
                 <!-- Master Sheet Table Scroll Container -->
                 <div class="overflow-x-auto master-scroll max-h-[75vh]">
-                    <table class="w-full text-center border-collapse border border-slate-400 text-xs select-none min-w-[1200px]" id="masterScheduleTable">
+                    <table class="w-full text-center border-collapse border border-slate-400 text-xs select-none" id="masterScheduleTable">
                         <thead id="masterScheduleHeader" class="bg-slate-200 text-slate-900 font-black sticky-header shadow-sm">
                             <!-- Populated dynamically via JS -->
                         </thead>
@@ -230,7 +258,7 @@
                 </div>
 
                 <!-- Footer Signatures for Print -->
-                <div class="mt-6 pt-4 border-t border-slate-300 grid grid-cols-3 text-center text-xs font-bold text-slate-800 hidden print-only">
+                <div class="mt-3 pt-2 border-t border-slate-400 grid grid-cols-3 text-center text-[10px] font-bold text-slate-800 hidden print-only">
                     <div>منسق الجدول: ________________</div>
                     <div>معاون المدير: ________________</div>
                     <div>مدير المدرسة: ________________</div>
@@ -369,7 +397,6 @@
                                 <option value="5">5 شعب (أ، ب، ج، د، هـ)</option>
                                 <option value="6">6 شعب (أ، ب، ج، د، هـ، و)</option>
                             </select>
-                            <p class="text-[11px] text-slate-400 mt-1">تنسق الشعب بالتسلسل الأبجدي وتظهر كأعمدة متتالية في الجدول الموحد.</p>
                         </div>
 
                         <button type="submit" class="w-full py-3 px-4 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow-md shadow-brand-600/20 transition flex items-center justify-center gap-2 text-xs">
@@ -400,6 +427,7 @@
 
     </main>
 
+    <!-- Modal for Manual Slot Editing -->
     <div id="editSlotModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs z-50 flex items-center justify-center hidden">
         <div class="bg-white rounded-2xl shadow-2xl border border-slate-200 max-w-md w-full mx-4 p-6 no-print">
             <div class="flex items-center justify-between pb-3 mb-4 border-b border-slate-100">
@@ -495,7 +523,6 @@
             }
         }
 
-        // Demo Seed Data matching Iraqi/Arab school formats
         function seedInitialDemoData() {
             classes = [
                 {
@@ -526,20 +553,19 @@
             ];
 
             teachers = [
-                { id: 't_1', name: 'أ. أحمد علي', subject: 'الرياضيات', quota: 18, offDays: ['Tuesday'], assignedSections: ['sec_1_1', 'sec_1_2', 'sec_2_1'] },
-                { id: 't_2', name: 'أ. فاطمة حسن', subject: 'اللغة العربية', quota: 20, offDays: ['Thursday'], assignedSections: ['sec_1_1', 'sec_1_3', 'sec_2_2'] },
-                { id: 't_3', name: 'د. خالد الزبيدي', subject: 'العلوم العامة', quota: 15, offDays: ['Monday'], assignedSections: ['sec_2_1', 'sec_2_2', 'sec_3_1'] },
-                { id: 't_4', name: 'ست زينب كاظم', subject: 'الإنجليزية', quota: 16, offDays: [], assignedSections: ['sec_1_2', 'sec_3_1', 'sec_3_2'] },
-                { id: 't_5', name: 'أ. حيدر الساعدي', subject: 'الإسلامية', quota: 12, offDays: ['Wednesday'], assignedSections: ['sec_1_1', 'sec_1_2', 'sec_1_3', 'sec_2_1', 'sec_2_2', 'sec_3_1', 'sec_3_2'] },
-                { id: 't_6', name: 'أ. مريم العبيدي', subject: 'الاجتماعيات', quota: 14, offDays: ['Sunday'], assignedSections: ['sec_1_1', 'sec_1_2', 'sec_2_1', 'sec_3_2'] },
-                { id: 't_7', name: 'أ. مصطفى كريم', subject: 'الرياضة', quota: 10, offDays: [], assignedSections: ['sec_1_1', 'sec_1_2', 'sec_1_3', 'sec_2_1', 'sec_2_2', 'sec_3_1', 'sec_3_2'] }
+                { id: 't_1', name: 'أ. أحمد علي', subject: 'الرياضيات', quota: 15, offDays: ['Tuesday'], assignedSections: ['sec_1_1', 'sec_1_2', 'sec_2_1'] },
+                { id: 't_2', name: 'أ. فاطمة حسن', subject: 'اللغة العربية', quota: 15, offDays: ['Thursday'], assignedSections: ['sec_1_1', 'sec_1_3', 'sec_2_2'] },
+                { id: 't_3', name: 'د. خالد الزبيدي', subject: 'العلوم العامة', quota: 12, offDays: ['Monday'], assignedSections: ['sec_2_1', 'sec_2_2', 'sec_3_1'] },
+                { id: 't_4', name: 'ست زينب كاظم', subject: 'الإنجليزية', quota: 12, offDays: [], assignedSections: ['sec_1_2', 'sec_3_1', 'sec_3_2'] },
+                { id: 't_5', name: 'أ. حيدر الساعدي', subject: 'الإسلامية', quota: 10, offDays: ['Wednesday'], assignedSections: ['sec_1_1', 'sec_1_2', 'sec_1_3', 'sec_2_1', 'sec_2_2', 'sec_3_1', 'sec_3_2'] },
+                { id: 't_6', name: 'أ. مريم العبيدي', subject: 'الاجتماعيات', quota: 10, offDays: ['Sunday'], assignedSections: ['sec_1_1', 'sec_1_2', 'sec_2_1', 'sec_3_2'] },
+                { id: 't_7', name: 'أ. مصطفى كريم', subject: 'الرياضة', quota: 8, offDays: [], assignedSections: ['sec_1_1', 'sec_1_2', 'sec_1_3', 'sec_2_1', 'sec_2_2', 'sec_3_1', 'sec_3_2'] }
             ];
 
             saveToLocalStorage();
             generateSchedule();
         }
 
-        // Navigation Switcher
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden'));
             document.querySelectorAll('.tab-btn').forEach(btn => {
@@ -557,7 +583,6 @@
             if (tabId === 'masterTableTab') renderMasterTable();
         }
 
-        // Toast Notifications
         function showToast(message, type = 'info') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
@@ -582,13 +607,13 @@
             renderMasterTable();
         }
 
+        // Render Master Sheet Table
         function renderMasterTable() {
             const thead = document.getElementById('masterScheduleHeader');
             const tbody = document.getElementById('masterScheduleBody');
 
             if (!thead || !tbody) return;
 
-            // Collect all sections sequentially
             const allSections = [];
             classes.forEach(c => {
                 c.sections.forEach(sec => {
@@ -607,23 +632,23 @@
                 return;
             }
 
-            // Build Header Row 1: Classes & Sections
+            // Header Row 1
             let headerRow1 = `<tr>
-                <th rowspan="2" class="border border-slate-400 p-2 bg-slate-300 text-slate-900 font-black sticky-col min-w-[70px]">اليوم</th>
-                <th rowspan="2" class="border border-slate-400 p-2 bg-slate-300 text-slate-900 font-black sticky-col min-w-[60px]" style="right: 70px;">الحصة</th>
+                <th rowspan="2" class="border border-slate-400 p-1 bg-slate-300 text-slate-900 font-black sticky-col min-w-[50px] w-[50px] text-[10px]">اليوم</th>
+                <th rowspan="2" class="border border-slate-400 p-1 bg-slate-300 text-slate-900 font-black sticky-col min-w-[35px] w-[35px] text-[10px]" style="right: 50px;">ح</th>
             `;
 
             allSections.forEach(sec => {
-                headerRow1 += `<th class="border border-slate-400 p-2 bg-brand-800 text-white font-black text-xs sm:text-sm min-w-[120px]">${sec.fullName}</th>`;
+                headerRow1 += `<th class="border border-slate-400 p-1 bg-brand-800 text-white font-black text-[10px] sm:text-xs">${sec.fullName}</th>`;
             });
             headerRow1 += `</tr>`;
 
-            // Build Header Row 2: Teachers / Subject Columns Header
+            // Header Row 2
             let headerRow2 = `<tr>`;
             allSections.forEach(() => {
                 headerRow2 += `
-                    <th class="border border-slate-400 p-1 bg-brand-100 text-brand-900 font-bold text-[11px]">
-                        <div class="grid grid-cols-2 gap-1 text-center">
+                    <th class="border border-slate-400 p-0.5 bg-brand-100 text-brand-900 font-bold text-[9px]">
+                        <div class="grid grid-cols-2 text-center">
                             <span>الدرس</span>
                             <span>المدرس</span>
                         </div>
@@ -634,7 +659,6 @@
 
             thead.innerHTML = headerRow1 + headerRow2;
 
-            // Build Table Body Rows (Grouped by Days & Periods)
             tbody.innerHTML = '';
 
             DAYS.forEach(day => {
@@ -642,16 +666,13 @@
                     const tr = document.createElement('tr');
                     tr.className = period % 2 === 0 ? 'bg-white' : 'bg-slate-50/70';
 
-                    // Day cell spanning all periods of that day
                     let dayCell = '';
                     if (period === 0) {
-                        dayCell = `<td rowspan="${periodsPerDay}" class="border border-slate-400 p-2 font-black bg-slate-200 text-slate-900 text-sm align-middle sticky-col min-w-[70px]">${day.name}</td>`;
+                        dayCell = `<td rowspan="${periodsPerDay}" class="border border-slate-400 p-1 font-black bg-slate-200 text-slate-900 text-xs align-middle sticky-col min-w-[50px] w-[50px] pdf-title-fix">${day.name}</td>`;
                     }
 
-                    // Period Number Cell
-                    let periodCell = `<td class="border border-slate-400 p-2 font-bold bg-slate-100 text-slate-800 sticky-col min-w-[60px]" style="right: 70px;">${period + 1}</td>`;
+                    let periodCell = `<td class="border border-slate-400 p-1 font-bold bg-slate-100 text-slate-800 sticky-col min-w-[35px] w-[35px] text-[10px]" style="right: 50px;">${period + 1}</td>`;
 
-                    // Columns for each Section
                     let sectionCells = '';
                     allSections.forEach(sec => {
                         const secId = sec.sectionId;
@@ -660,22 +681,22 @@
 
                         if (teacher) {
                             sectionCells += `
-                                <td onclick="openEditModal('${day.key}', ${period}, '${secId}')" class="border border-slate-400 p-1.5 cursor-pointer hover:bg-sky-100/80 transition relative group cell-box">
-                                    <div class="grid grid-cols-2 gap-1 items-center text-[11px] font-bold">
-                                        <span class="text-brand-800 truncate" title="${teacher.subject}">${teacher.subject}</span>
-                                        <span class="text-slate-700 truncate font-semibold" title="${teacher.name}">${teacher.name}</span>
+                                <td onclick="openEditModal('${day.key}', ${period}, '${secId}')" class="border border-slate-400 p-0.5 cursor-pointer hover:bg-sky-100 transition relative group cell-box">
+                                    <div class="grid grid-cols-2 gap-0.5 items-center text-[9px] sm:text-[10px] leading-tight font-bold">
+                                        <span class="text-brand-900 truncate" title="${teacher.subject}">${teacher.subject}</span>
+                                        <span class="text-slate-800 truncate font-semibold" title="${teacher.name}">${teacher.name}</span>
                                     </div>
-                                    <i class="fa-solid fa-pen text-[9px] text-brand-500 absolute top-0.5 left-0.5 opacity-0 group-hover:opacity-100 no-print"></i>
+                                    <i class="fa-solid fa-pen text-[8px] text-brand-500 absolute top-0.5 left-0.5 opacity-0 group-hover:opacity-100 no-print"></i>
                                 </td>
                             `;
                         } else {
                             sectionCells += `
-                                <td onclick="openEditModal('${day.key}', ${period}, '${secId}')" class="border border-slate-400 p-1.5 text-slate-300 cursor-pointer hover:bg-amber-50 transition relative group cell-box">
-                                    <div class="grid grid-cols-2 gap-1 items-center text-[11px] font-light text-slate-300">
+                                <td onclick="openEditModal('${day.key}', ${period}, '${secId}')" class="border border-slate-400 p-0.5 text-slate-300 cursor-pointer hover:bg-amber-50 transition relative group cell-box">
+                                    <div class="grid grid-cols-2 gap-0.5 items-center text-[9px] text-slate-300">
                                         <span>---</span>
                                         <span>---</span>
                                     </div>
-                                    <i class="fa-solid fa-plus text-[9px] text-slate-400 absolute top-0.5 left-0.5 opacity-0 group-hover:opacity-100 no-print"></i>
+                                    <i class="fa-solid fa-plus text-[8px] text-slate-400 absolute top-0.5 left-0.5 opacity-0 group-hover:opacity-100 no-print"></i>
                                 </td>
                             `;
                         }
@@ -692,11 +713,10 @@
             saveToLocalStorage();
 
             if (teachers.length === 0 || classes.length === 0) {
-                showToast('يرجى إضافة المدرسين والصفوف والشعب أولاً قبل التوزيع.', 'error');
+                showToast('يرجى إضافة المدرسين والصفوف والشعب أولاً.', 'error');
                 return;
             }
 
-            // Extract all sections
             const allSections = [];
             classes.forEach(c => {
                 c.sections.forEach(sec => {
@@ -718,7 +738,7 @@
                 });
             });
 
-            // Track Teacher Quotas & Daily Balance
+            // Track Teacher Quotas
             const teacherLoad = {};
             teachers.forEach(t => {
                 teacherLoad[t.id] = {
@@ -727,48 +747,46 @@
                 };
             });
 
-            // Distribution Logic
+            // Smart Loop over Days & Periods
             DAYS.forEach(day => {
                 const dayKey = day.key;
 
                 for (let period = 0; period < periodsPerDay; period++) {
-                    // Randomize sections sequence each period to eliminate bias
                     const shuffledSections = [...allSections].sort(() => Math.random() - 0.5);
 
                     shuffledSections.forEach(secObj => {
                         const secId = secObj.sectionId;
 
-                        // Eligible Teachers
                         const candidateTeachers = teachers.filter(t => {
-                            // 1. Must be assigned to teach this section
+                            // Rule 1: Must be assigned to this section
                             if (!t.assignedSections || !t.assignedSections.includes(secId)) return false;
-                            
-                            // 2. Respect teacher's off day
+
+                            // Rule 2: Respect teacher's off days
                             if (t.offDays && t.offDays.includes(dayKey)) return false;
 
-                            // 3. Respect teacher's weekly quota
+                            // Rule 3: Respect weekly quota
                             if (teacherLoad[t.id].assignedTotal >= t.quota) return false;
 
-                            // 4. No double booking: Teacher cannot teach another section in this same period
-                            let isBusyElsewhere = false;
+                            // Rule 4: No double booking in same period across sections
+                            let isBusyInPeriod = false;
                             for (let otherSecId in schedule) {
                                 if (schedule[otherSecId][dayKey] && schedule[otherSecId][dayKey][period] === t.id) {
-                                    isBusyElsewhere = true;
+                                    isBusyInPeriod = true;
                                     break;
                                 }
                             }
-                            if (isBusyElsewhere) return false;
+                            if (isBusyInPeriod) return false;
 
-                            // 5. Max 2 lessons of same subject in same section per day
+                            // STRICT RULE 5: NO REPEAT OF TEACHER IN SAME SECTION IN THE SAME DAY
                             const currentDaySlotsForSec = schedule[secId][dayKey];
-                            const alreadyTeachesSecToday = currentDaySlotsForSec.filter(id => id === t.id).length;
-                            if (alreadyTeachesSecToday >= 2) return false;
+                            const timesTaughtSecToday = currentDaySlotsForSec.filter(id => id === t.id).length;
+                            if (timesTaughtSecToday >= 1) return false; // Strictly 1 lesson per section per day
 
                             return true;
                         });
 
                         if (candidateTeachers.length > 0) {
-                            // Balance teacher workload ratio
+                            // Sort by quota utilization ratio to balance load
                             candidateTeachers.sort((a, b) => {
                                 const ratioA = teacherLoad[a.id].assignedTotal / a.quota;
                                 const ratioB = teacherLoad[b.id].assignedTotal / b.quota;
@@ -785,10 +803,10 @@
 
             saveToLocalStorage();
             renderMasterTable();
-            showToast('تم إجراء التوزيع الذكي للجدول الشامل الموحد بنجاح!', 'success');
+            showToast('تم إجراء التوزيع الذكي بنجاح بدون تكرار للمدرس بنفس الشعبة واليوم!', 'success');
         }
 
-        // Manual Edit Modal Logic
+        // Modal Handlers
         function openEditModal(dayKey, periodIdx, sectionId) {
             document.getElementById('modalDayKey').value = dayKey;
             document.getElementById('modalPeriodIndex').value = periodIdx;
@@ -833,7 +851,7 @@
             closeEditModal();
         }
 
-        // Teachers Section Functions
+        // Teachers Handlers
         function renderTeachersList() {
             const tbody = document.getElementById('teachersTableBody');
             const searchVal = (document.getElementById('searchTeacher').value || '').toLowerCase();
@@ -1000,7 +1018,7 @@
             }
         }
 
-        // Classes Management Functions
+        // Classes Handlers
         function renderClassesList() {
             const container = document.getElementById('classesContainer');
             if (!container) return;
@@ -1124,7 +1142,7 @@
             }
         }
 
-        // Export Functions
+        // Export Excel
         function exportMasterToExcel() {
             const allSections = [];
             classes.forEach(c => {
@@ -1138,19 +1156,16 @@
                 return;
             }
 
-            // Excel Rows
             const data = [];
             data.push(['جدول الحصص الأسبوعي الموحد']);
             
-            // Header Row 1
             const h1 = ['اليوم', 'الحصة'];
             allSections.forEach(s => {
                 h1.push(s.name);
-                h1.push(''); // placeholder for teacher column
+                h1.push('');
             });
             data.push(h1);
 
-            // Header Row 2
             const h2 = ['', ''];
             allSections.forEach(() => {
                 h2.push('الدرس');
@@ -1158,7 +1173,6 @@
             });
             data.push(h2);
 
-            // Days & Periods
             DAYS.forEach(day => {
                 for (let p = 0; p < periodsPerDay; p++) {
                     const row = [day.name, `الحصة ${p + 1}`];
@@ -1182,18 +1196,6 @@
             XLSX.utils.book_append_sheet(wb, ws, 'الجدول الشامل');
             XLSX.writeFile(wb, 'Master_School_Schedule.xlsx');
             showToast('تم تصدير ملف Excel الشامل بنجاح', 'success');
-        }
-
-        function exportMasterToPDF() {
-            const element = document.getElementById('masterSheetPrintArea');
-            const opt = {
-                margin:       0.2,
-                filename:     'Master_School_Schedule.pdf',
-                image:        { type: 'jpeg', quality: 0.98 },
-                html2canvas:  { scale: 2, useCORS: true },
-                jsPDF:        { unit: 'in', format: 'a3', orientation: 'landscape' }
-            };
-            html2pdf().set(opt).from(element).save();
         }
     </script>
 </body>
